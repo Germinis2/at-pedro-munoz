@@ -156,6 +156,6 @@ export const juvenil: Team = {
   matches,
   standings,
   standingsRound: 5,
-  players: buildPlayers({ squad, matches }),
+  players: buildPlayers({ team: 'juvenil', squad, matches }),
   full: false,
 }

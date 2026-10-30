@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Silhouette } from '../components/Silhouette'
+import { PlayerImage } from '../components/PlayerImage'
 import { positionLabel } from '../data/build'
 import { useTeam } from '../data/teams'
 import type { StatKey } from '../data/types'
@@ -22,7 +22,7 @@ export function Leaderboard({ title, stat, limit = 5, compact = false }: { title
                 <span className="w-4 text-sm font-bold text-white/40">{i + 1}</span>
                 {!compact && (
                   <span className="size-10 shrink-0 overflow-hidden rounded-full bg-club-800">
-                    <Silhouette className="size-full" />
+                    <PlayerImage player={p} className="size-full" />
                   </span>
                 )}
                 <span className="min-w-0 flex-1">

@@ -41,6 +41,7 @@ export interface Player {
   lastName: string
   nickname?: string
   fullName: string
+  photo?: string
   number: number | null
   position: Position | null // null = sin asignar todavía
   appearances: number

@@ -30,6 +30,6 @@ export const primer: Team = {
   matches,
   standings,
   standingsRound: 4,
-  players: buildPlayers({ squad, matches, profiles, clubStats }),
+  players: buildPlayers({ team: 'primer', squad, matches, profiles, clubStats }),
   full: true,
 }

@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from '../components/Icons'
 import { MatchCard } from '../components/MatchCard'
 import { Shirt } from '../components/Shirt'
-import { Silhouette } from '../components/Silhouette'
+import { PlayerImage } from '../components/PlayerImage'
 import { StatRing } from '../components/StatRing'
 import { positionLabel, sortPlayers, upcoming } from '../data/build'
 import { useTeam } from '../data/teams'
@@ -125,7 +125,7 @@ export function Player() {
         <span className="absolute inset-x-0 top-0 text-center text-[180px] font-extrabold leading-none text-white/[0.05] lg:text-[260px]">
           {p.number}
         </span>
-        <Silhouette className="absolute inset-x-0 bottom-0 mx-auto h-full w-full" />
+        <PlayerImage player={p} className="absolute inset-x-0 bottom-0 mx-auto h-full w-full" photoClassName="absolute inset-0 size-full lg:rounded-3xl" />
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-club-950 to-transparent lg:hidden" />
         {/* Flechas en móvil */}
         <div className="absolute inset-x-4 top-1/2 flex -translate-y-1/2 justify-between lg:hidden">

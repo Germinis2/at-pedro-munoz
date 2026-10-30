@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from '../components/Icons'
-import { Silhouette } from '../components/Silhouette'
+import { PlayerImage } from '../components/PlayerImage'
 import { positionLabel, positionLabels, positionOrder, sortPlayers } from '../data/build'
 import { useTeam } from '../data/teams'
 import type { Position } from '../data/types'
@@ -100,7 +100,7 @@ export function Squad() {
                 <span className="absolute -right-2 top-2 text-[120px] font-extrabold leading-none text-white/[0.06] md:text-[150px]">
                   {p.number ?? ''}
                 </span>
-                <Silhouette className="relative mx-auto mt-6 h-[260px] w-full md:h-[330px]" />
+                <PlayerImage player={p} className="relative mx-auto mt-6 h-[260px] w-full md:h-[330px]" photoClassName="relative h-[286px] w-full md:h-[356px]" />
                 <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-club-950 via-club-950/70 to-transparent" />
                 <div className="absolute inset-x-0 bottom-4 text-center">
                   <span className="mx-auto mb-2 grid size-9 place-items-center rounded-full bg-club-500 text-sm font-bold shadow-lg shadow-club-950/50">
@@ -150,7 +150,7 @@ export function Squad() {
                     <li key={p.id}>
                       <Link to={`${team.base}/jugador/${p.id}`} className="panel group relative block overflow-hidden pt-3 transition hover:bg-white/10">
                         <span className="absolute left-3 top-2 text-2xl font-bold text-white/30">{p.number ?? ''}</span>
-                        <Silhouette className="mx-auto h-28 w-full transition-transform duration-300 group-hover:scale-105" />
+                        <PlayerImage player={p} className="mx-auto h-28 w-full transition-transform duration-300 group-hover:scale-105" photoClassName="-mt-3 h-31 w-full transition-transform duration-300 group-hover:scale-105" />
                         <div className="border-t border-white/10 bg-club-950/40 px-3 py-2.5">
                           <p className="truncate text-sm font-semibold">{p.firstName} {p.lastName}</p>
                           <p className="text-[11px] text-white/50">{positionLabel(p.position)}</p>

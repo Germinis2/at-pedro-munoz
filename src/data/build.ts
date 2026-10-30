@@ -1,3 +1,4 @@
+import { photoFor } from './photos'
 import type { Match, Player, Position, Standing } from './types'
 
 export const positionLabels: Record<Position, { one: string; many: string }> = {
@@ -43,11 +44,13 @@ function statsFor(raw: string, keeper: boolean, matches: Match[]) {
 }
 
 export function buildPlayers({
+  team,
   squad,
   matches,
   profiles = {},
   clubStats = {},
 }: {
+  team: string // carpeta de fotos
   squad: Record<string, Position | null> // "APELLIDOS, NOMBRE" como en la FFCM
   matches: Match[]
   profiles?: Record<string, [number, string, string?]> // [dorsal, nombre deportivo, apodo?]
@@ -59,8 +62,10 @@ export function buildPlayers({
     const [number, display, nickname] = profiles[raw] ?? [null, `${name} ${surnames.split(' ')[0]}`]
     const [first, ...rest] = display.split(' ')
     const stats = statsFor(raw, position === 'POR', matches)
+    const id = slug(`${name} ${surnames}`)
     return {
-      id: slug(`${name} ${surnames}`),
+      id,
+      photo: photoFor(team, id),
       ffcm: raw,
       firstName: first,
       lastName: rest.join(' '),

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { Crest } from '../components/Crest'
 import { MatchCard, ResultDot, fmtLongDay, fmtTime } from '../components/MatchCard'
-import { Silhouette } from '../components/Silhouette'
+import { PlayerImage } from '../components/PlayerImage'
 import { kickoff, played, sortPlayers, summary, upcoming } from '../data/build'
 import { club } from '../data/club'
 import { teams, useTeam } from '../data/teams'
@@ -163,7 +163,7 @@ export function Home() {
             <li key={p.id} className="w-32 shrink-0 snap-start md:w-40">
               <Link to={`${team.base}/jugador/${p.id}`} className="panel group relative block overflow-hidden pt-3">
                 <span className="absolute left-2.5 top-1.5 text-xl font-bold text-white/30">{p.number ?? ''}</span>
-                <Silhouette className="mx-auto h-28 w-full transition-transform group-hover:scale-105 md:h-36" />
+                <PlayerImage player={p} className="mx-auto h-28 w-full transition-transform group-hover:scale-105 md:h-36" photoClassName="-mt-3 h-31 w-full transition-transform group-hover:scale-105 md:h-39" />
                 <p className="truncate border-t border-white/10 bg-club-950/40 px-2.5 py-2 text-xs font-semibold">{p.firstName} {p.lastName}</p>
               </Link>
             </li>
