@@ -63,7 +63,7 @@ export function MvpCard() {
           <div>
             <span className="rounded-full bg-amber-300 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-club-950">MVP · Jornada {match.round}</span>
             <p className="mt-1.5 text-2xl font-bold leading-tight">{winner.firstName} {winner.lastName}</p>
-            <p className="text-sm text-white/60">{pct(winner.id)}% de {total} votos</p>
+            <p className="text-sm text-white/60">{pct(winner.id)}% de {total} {total === 1 ? 'voto' : 'votos'}</p>
           </div>
         </Link>
       </section>
@@ -74,7 +74,7 @@ export function MvpCard() {
     <section>
       {head}
       <div className="panel p-4">
-        <p className="mb-3 text-sm text-white/60">{showResults ? `Gracias por votar · ${total} votos` : '¿Quién fue el mejor? Un voto por dispositivo.'}</p>
+        <p className="mb-3 text-sm text-white/60">{showResults ? `Gracias por votar · ${total} ${total === 1 ? 'voto' : 'votos'}` : '¿Quién fue el mejor? Un voto por dispositivo.'}</p>
         <ul className="grid gap-2 sm:grid-cols-2">
           {list.map((p) => (
             <li key={p.id}>

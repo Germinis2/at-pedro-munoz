@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
+import { parseActa } from '../data/acta'
+import { actaUrl } from '../data/build'
 import { splitFfcm } from '../data/names'
 import { useTeams } from '../data/teams'
 import type { Lineup, MatchRow, PlayerRow } from '../data/types'
 import { supabase } from '../lib/supabase'
-import { Button, Field, Input, Notice, Select, num } from './ui'
+import { Button, Field, Input, Notice, Select, inputCls, num } from './ui'
 
 const emptyLineup = (): Lineup => ({ starters: [], bench: [], subs: [], goals: [] })
 const nameOf = (players: PlayerRow[], raw: string) => {
@@ -93,29 +95,34 @@ function LineupEditor({ lineup, players, onChange }: { lineup: Lineup; players: 
 function MatchEditor({ initial, players, onDone }: { initial: MatchRow; players: PlayerRow[]; onDone: () => void }) {
   const [m, setM] = useState<MatchRow>(initial)
   const [acta, setActa] = useState(initial.acta?.toString() ?? '')
+  const [pasted, setPasted] = useState('')
   const [msg, setMsg] = useState<{ kind: 'error' | 'ok' | 'info'; text: string } | null>(null)
   const [busy, setBusy] = useState(false)
   const set = <K extends keyof MatchRow>(k: K, v: MatchRow[K]) => setM((x) => ({ ...x, [k]: v }))
 
-  const importActa = async () => {
-    setBusy(true)
-    setMsg(null)
-    const { data, error } = await supabase.functions.invoke('importar-acta', { body: { acta: Number(acta) } })
-    setBusy(false)
-    if (error || data?.error) return setMsg({ kind: 'error', text: data?.error ?? 'No se pudo leer el acta' })
-    setM((x) => ({
-      ...x,
-      acta: data.acta,
-      round: x.id ? x.round : (data.round ?? x.round),
-      date: data.date ?? x.date,
-      time: data.time ?? x.time,
-      home: data.home,
-      venue: x.venue ?? data.venue,
-      score_us: data.score.us,
-      score_them: data.score.them,
-      lineup: data.lineup,
-    }))
-    setMsg({ kind: 'info', text: 'Acta importada. Revisa el marcador (la FFCM no deja leerlo directamente: se calcula con los goleadores y falla si hay goles en propia puerta) y pulsa Guardar.' })
+  const readActa = () => {
+    try {
+      const data = parseActa(pasted)
+      setM((x) => ({
+        ...x,
+        acta: acta ? Number(acta) : x.acta,
+        round: x.id ? x.round : (data.round ?? x.round),
+        date: data.date ?? x.date,
+        time: data.time ?? x.time,
+        home: data.home,
+        venue: x.venue ?? data.venue,
+        score_us: data.score.us,
+        score_them: data.score.them,
+        lineup: data.lineup,
+      }))
+      setPasted('')
+      setMsg({
+        kind: 'info',
+        text: `Acta leída: ${data.lineup.starters.length} titulares, ${data.lineup.subs.length} cambios y ${data.lineup.goals.length} goles. Revisa el marcador (la FFCM lo oculta: se calcula con los goleadores y falla si hay goles en propia puerta) y pulsa Guardar.`,
+      })
+    } catch (e) {
+      setMsg({ kind: 'error', text: e instanceof Error ? e.message : 'No se pudo leer el acta' })
+    }
   }
 
   const save = async () => {
@@ -137,12 +144,35 @@ function MatchEditor({ initial, players, onDone }: { initial: MatchRow; players:
 
   return (
     <div className="panel space-y-6 p-5">
-      <div className="flex flex-wrap items-end gap-2">
-        <Field label="Nº de acta FFCM" className="w-40">
-          <Input inputMode="numeric" value={acta} onChange={(e) => setActa(e.target.value)} placeholder="598024" />
-        </Field>
-        <Button type="button" variant="ghost" disabled={busy || !acta} onClick={importActa}>Importar acta</Button>
-        <p className="w-full text-[11px] text-white/40">El nº está en la dirección del acta en la FFCM (CodActa=…). También puedes rellenarlo todo a mano.</p>
+      <div className="space-y-3 rounded-xl border border-white/10 p-4">
+        <p className="text-sm font-semibold">Importar desde el acta de la FFCM</p>
+        <ol className="list-decimal space-y-1 pl-5 text-xs text-white/60">
+          <li>Pon el nº de acta (sale en la dirección del acta: CodActa=…) y pulsa «Abrir acta».</li>
+          <li>En la página del acta: Ctrl+A y Ctrl+C (en el móvil: seleccionar todo y copiar).</li>
+          <li>Pégalo abajo y pulsa «Leer acta». Revisa y guarda.</li>
+        </ol>
+        <div className="flex flex-wrap items-end gap-2">
+          <Field label="Nº de acta" className="w-36">
+            <Input inputMode="numeric" value={acta} onChange={(e) => setActa(e.target.value.replace(/\D/g, ''))} placeholder="598024" />
+          </Field>
+          <a
+            href={acta ? actaUrl(Number(acta)) : undefined}
+            target="_blank"
+            rel="noreferrer"
+            className={`rounded-full bg-white/10 px-4 py-2 text-sm font-semibold ${acta ? 'hover:bg-white/15' : 'pointer-events-none opacity-40'}`}
+          >
+            Abrir acta ↗
+          </a>
+        </div>
+        <textarea
+          value={pasted}
+          onChange={(e) => setPasted(e.target.value)}
+          rows={3}
+          placeholder="Pega aquí el texto del acta"
+          className={`${inputCls} font-mono text-xs`}
+        />
+        <Button type="button" variant="ghost" disabled={!pasted.trim()} onClick={readActa}>Leer acta</Button>
+        <p className="text-[11px] text-white/40">También puedes rellenarlo todo a mano en el formulario de abajo.</p>
       </div>
       {msg && <Notice kind={msg.kind}>{msg.text}</Notice>}
 
