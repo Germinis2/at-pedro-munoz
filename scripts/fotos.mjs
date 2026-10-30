@@ -6,8 +6,9 @@ import { mkdir, readdir } from 'node:fs/promises'
 import { parse } from 'node:path'
 import sharp from 'sharp'
 
-// Zona del jugador en proporción al tamaño de la imagen
-const CROP = { left: 0.52, top: 0.055, width: 0.445 }
+// Zona del jugador en proporción al tamaño de la imagen. Termina por encima de la línea
+// del nombre (abajo, ~87% del alto), que en nombres largos invade la zona del jugador.
+const CROP = { left: 0.545, top: 0, width: 0.42 }
 
 for (const team of await readdir('assets-src/fotos')) {
   const out = `src/assets/fotos/${team}`

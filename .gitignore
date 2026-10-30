@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Descargas originales de fotos (pesan y tienen duplicados)
+assets-src/fotos-originales/
