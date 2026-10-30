@@ -71,6 +71,7 @@ export function Player() {
             {positionLabels[p.position].one}
           </span>
           {p.number && <span className="text-sm font-medium text-white/70">Dorsal {p.number}</span>}
+          {p.nickname && <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">“{p.nickname}”</span>}
         </div>
 
         <div className="mt-3 flex items-center gap-5">

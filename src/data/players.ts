@@ -14,6 +14,7 @@ export interface Player {
   ffcm: string
   firstName: string
   lastName: string
+  nickname?: string
   fullName: string
   number: number | null
   position: Position
@@ -30,7 +31,6 @@ const squad: Record<string, Position> = {
   'SALIDO MOLINA, SERGIO': 'POR',
   'GONZALEZ FERNANDEZ, ISMAEL': 'POR',
   'ROSU BASCUÑANA, ALEXIS': 'POR',
-  // PROVISIONAL: posiciones de campo de relleno hasta tener las reales
   'ZARCO MARTINEZ, JORGE': 'DEF',
   'MERINO FERNANDEZ, IVAN': 'DEF',
   'HEREDIA MORALES, ISMAEL': 'DEF',
@@ -39,26 +39,61 @@ const squad: Record<string, Position> = {
   'MONEDERO ALBERCA, CARLOS': 'DEF',
   'RAMOS LOPEZ, JOSE LUIS': 'DEF',
   'RODRIGUEZ GONZALEZ, RAUL': 'DEF',
+  'RAMOS LOPEZ, JAVIER': 'DEF',
   'DELGADO AYUSO MORALES, DIEGO': 'MED',
   'VILLEGAS PULPON, VICTOR': 'MED',
   'FELGUERA PEREA, DANIEL': 'MED',
   'PLATAS MUÑOZ, JESUS': 'MED',
   'FERNANDEZ MUÑOZ, ALVARO': 'MED',
-  'DELGADO FERNANDEZ CAÑADAS, GUILLERMO': 'MED',
   'MUÑOZ PLIEGO, PABLO': 'MED',
-  'RAMOS LOPEZ, JAVIER': 'MED',
   'YUSTE MUÑOZ, ADRIAN': 'MED',
   'PORRERO MOTA, HUGO': 'MED',
+  'BOUNAB CHARQI, ISMAEL': 'MED',
   'HERREROS RODRIGUEZ, ALEJANDRO': 'DEL',
   'PULPON BUENDIA, REYES': 'DEL',
   'SANCHEZ ALBERCA, JAIME': 'DEL',
   'MOURA FERREIRA, JACKSON': 'DEL',
   'CASERO VILLALGORDO, JAVIER': 'DEL',
-  'BOUNAB CHARQI, ISMAEL': 'DEL',
+  'DELGADO FERNANDEZ CAÑADAS, GUILLERMO': 'DEL',
 }
 
-// Las actas de la FFCM no recogen asistencias: se apuntan a mano
-const assists: Record<string, number> = {}
+// Dorsal y nombre deportivo según el club (Excel de estadísticas). [dorsal, nombre, apodo?]
+const profiles: Record<string, [number, string, string?]> = {
+  'RODRIGUEZ GONZALEZ, RAUL': [1, 'Raúl Rodríguez', 'Pincho'],
+  'ZARCO MARTINEZ, JORGE': [2, 'Jorge Zarco'],
+  'MERINO FERNANDEZ, IVAN': [3, 'Iván Merino'],
+  'ESCUDERO RIVAS, ISAAC': [4, 'Isaac Escudero'],
+  'HEREDIA MORALES, ISMAEL': [5, 'Ismael Heredia'],
+  'DELGADO AYUSO MORALES, DIEGO': [6, 'Diego Delgado'],
+  'HERREROS RODRIGUEZ, ALEJANDRO': [7, 'Alejandro Herreros'],
+  'VILLEGAS PULPON, VICTOR': [8, 'Víctor Villegas'],
+  'MOURA FERREIRA, JACKSON': [9, 'Jackson Moura'],
+  'FERNANDEZ MUÑOZ, ALVARO': [10, 'Álvaro Fernández'],
+  'PULPON BUENDIA, REYES': [11, 'Reyes Pulpón'],
+  'RAMOS LOPEZ, JOSE LUIS': [12, 'Joselu Ramos'],
+  'SALIDO MOLINA, SERGIO': [13, 'Sergio Salido', 'Pato'],
+  'YUSTE MUÑOZ, ADRIAN': [14, 'Adrián Yuste'],
+  'DELGADO FERNANDEZ CAÑADAS, GUILLERMO': [15, 'Guillermo Delgado'],
+  'ESCUDERO RIVAS, SAMUEL': [16, 'Samu Escudero'],
+  'CASERO VILLALGORDO, JAVIER': [17, 'Javi Casero'],
+  'SANCHEZ ALBERCA, JAIME': [18, 'Jaime Sánchez'],
+  'MONEDERO ALBERCA, CARLOS': [19, 'Carlos Monedero'],
+  'PLATAS MUÑOZ, JESUS': [20, 'Jesús Platas'],
+  'BOUNAB CHARQI, ISMAEL': [21, 'Ismael Bounab'],
+  'RAMOS LOPEZ, JAVIER': [22, 'Javi Ramos'],
+  'FELGUERA PEREA, DANIEL': [23, 'Dani Perea'],
+  'PORRERO MOTA, HUGO': [24, 'Hugo Porrero'],
+  'MUÑOZ PLIEGO, PABLO': [25, 'Pablo Muñoz'],
+}
+
+// Las actas de la FFCM no recogen asistencias: se apuntan a mano (Excel del club)
+const assists: Record<string, number> = {
+  'ZARCO MARTINEZ, JORGE': 2,
+  'HEREDIA MORALES, ISMAEL': 1,
+  'DELGADO FERNANDEZ CAÑADAS, GUILLERMO': 1,
+  'ESCUDERO RIVAS, SAMUEL': 1,
+  'FELGUERA PEREA, DANIEL': 1,
+}
 export const assistsTracked = Object.keys(assists).length > 0
 
 const capitalize = (s: string) => s.toLowerCase().replace(/(^|\s)\p{L}/gu, (c) => c.toUpperCase())
@@ -93,15 +128,20 @@ function statsFor(raw: string) {
 
 export const players: Player[] = Object.entries(squad).map(([raw, position]) => {
   const [surnames, name] = raw.split(',').map((s) => capitalize(s.trim()))
+  const [number, display, nickname] = profiles[raw] ?? [null, `${name} ${surnames.split(' ')[0]}`]
+  const [first, ...rest] = display.split(' ')
+  const stats = statsFor(raw)
   return {
     id: slug(`${name} ${surnames}`),
     ffcm: raw,
-    firstName: name,
-    lastName: surnames.split(' ')[0],
+    firstName: first,
+    lastName: rest.join(' '),
+    nickname,
     fullName: `${name} ${surnames}`,
     position,
     assists: assists[raw] ?? 0,
-    ...statsFor(raw),
+    ...stats,
+    number, // solo el dorsal oficial del club; en las actas varía de un partido a otro
   }
 })
 

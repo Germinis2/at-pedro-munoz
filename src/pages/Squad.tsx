@@ -109,7 +109,10 @@ export function Squad() {
 
       {current && (
         <div className="relative mt-5 text-center">
-          <p className="text-lg font-medium text-white/80 md:text-2xl">{current.firstName}</p>
+          <p className="text-lg font-medium text-white/80 md:text-2xl">
+            {current.firstName}
+            {current.nickname && <span className="text-club-300"> “{current.nickname}”</span>}
+          </p>
           <h2 className="text-5xl font-bold leading-none tracking-tight md:text-7xl">{current.lastName}</h2>
           <p className="label-caps mt-3">{positionLabels[current.position].one}{current.number && ` · Dorsal ${current.number}`}</p>
           <div className="mt-5 flex items-center justify-center gap-3">
