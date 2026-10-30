@@ -2,7 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from '../components/Icons'
 import { Silhouette } from '../components/Silhouette'
-import { positionLabels, positionOrder, sortedPlayers, type Position } from '../data/players'
+import { positionLabel, positionLabels, positionOrder, sortPlayers } from '../data/build'
+import { useTeam } from '../data/teams'
+import type { Position } from '../data/types'
 
 type Filter = 'ALL' | Position
 
@@ -11,10 +13,12 @@ export function Squad() {
   const [active, setActive] = useState(0)
   const navigate = useNavigate()
   const touchX = useRef<number | null>(null)
+  const team = useTeam()
+  const sorted = useMemo(() => sortPlayers(team.players), [team])
 
   const list = useMemo(
-    () => (filter === 'ALL' ? sortedPlayers : sortedPlayers.filter((p) => p.position === filter)),
-    [filter],
+    () => (filter === 'ALL' ? sorted : sorted.filter((p) => p.position === filter)),
+    [filter, sorted],
   )
   const current = list[active]
   const go = (d: number) => setActive((i) => Math.max(0, Math.min(list.length - 1, i + d)))
@@ -28,13 +32,16 @@ export function Squad() {
     return () => window.removeEventListener('keydown', onKey)
   })
 
-  const filters: Filter[] = ['ALL', ...positionOrder]
+  // Solo las posiciones que tienen jugadores (en el juvenil aún faltan por asignar)
+  const present = positionOrder.filter((pos) => sorted.some((p) => p.position === pos))
+  const filters: Filter[] = ['ALL', ...present]
+  const groups: (Position | null)[] = [...present, ...(sorted.some((p) => !p.position) ? [null] : [])]
 
   return (
     <section>
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="label-caps">Temporada 2026/27</p>
+          <p className="label-caps">{team.label} · Temporada 2026/27</p>
           <h1 className="text-3xl font-bold md:text-4xl">Plantilla</h1>
         </div>
         <p className="text-sm text-white/50">{list.length} jugadores</p>
@@ -75,7 +82,7 @@ export function Squad() {
           return (
             <button
               key={p.id}
-              onClick={() => (isActive ? navigate(`/jugador/${p.id}`) : setActive(i))}
+              onClick={() => (isActive ? navigate(`${team.base}/jugador/${p.id}`) : setActive(i))}
               aria-label={isActive ? `Ver ficha de ${p.fullName}` : `Mostrar a ${p.fullName}`}
               className="absolute bottom-0 left-1/2 w-[200px] transition-all duration-500 ease-out md:w-[260px]"
               style={{
@@ -114,12 +121,12 @@ export function Squad() {
             {current.nickname && <span className="text-club-300"> “{current.nickname}”</span>}
           </p>
           <h2 className="text-5xl font-bold leading-none tracking-tight md:text-7xl">{current.lastName}</h2>
-          <p className="label-caps mt-3">{positionLabels[current.position].one}{current.number && ` · Dorsal ${current.number}`}</p>
+          <p className="label-caps mt-3">{positionLabel(current.position)}{current.number && ` · Dorsal ${current.number}`}</p>
           <div className="mt-5 flex items-center justify-center gap-3">
             <button onClick={() => go(-1)} disabled={active === 0} className="grid size-11 place-items-center rounded-full bg-white/10 transition hover:bg-white/20 disabled:opacity-30" aria-label="Anterior">
               <ChevronLeft className="size-5" />
             </button>
-            <Link to={`/jugador/${current.id}`} className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-club-800 transition hover:bg-club-100">
+            <Link to={`${team.base}/jugador/${current.id}`} className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-club-800 transition hover:bg-club-100">
               Ver ficha
             </Link>
             <button onClick={() => go(1)} disabled={active === list.length - 1} className="grid size-11 place-items-center rounded-full bg-white/10 transition hover:bg-white/20 disabled:opacity-30" aria-label="Siguiente">
@@ -131,22 +138,22 @@ export function Squad() {
 
       {/* Lista completa por posiciones */}
       <div className="mt-14 space-y-10">
-        {positionOrder
+        {groups
           .filter((pos) => filter === 'ALL' || filter === pos)
           .map((pos) => (
-            <div key={pos}>
-              <h3 className="label-caps mb-3">{positionLabels[pos].many}</h3>
+            <div key={pos ?? 'none'}>
+              <h3 className="label-caps mb-3">{pos ? positionLabels[pos].many : 'Jugadores'}</h3>
               <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-                {sortedPlayers
+                {sorted
                   .filter((p) => p.position === pos)
                   .map((p) => (
                     <li key={p.id}>
-                      <Link to={`/jugador/${p.id}`} className="panel group relative block overflow-hidden pt-3 transition hover:bg-white/10">
+                      <Link to={`${team.base}/jugador/${p.id}`} className="panel group relative block overflow-hidden pt-3 transition hover:bg-white/10">
                         <span className="absolute left-3 top-2 text-2xl font-bold text-white/30">{p.number ?? ''}</span>
                         <Silhouette className="mx-auto h-28 w-full transition-transform duration-300 group-hover:scale-105" />
                         <div className="border-t border-white/10 bg-club-950/40 px-3 py-2.5">
                           <p className="truncate text-sm font-semibold">{p.firstName} {p.lastName}</p>
-                          <p className="text-[11px] text-white/50">{positionLabels[p.position].one}</p>
+                          <p className="text-[11px] text-white/50">{positionLabel(p.position)}</p>
                         </div>
                       </Link>
                     </li>

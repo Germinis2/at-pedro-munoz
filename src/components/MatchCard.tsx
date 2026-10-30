@@ -1,5 +1,6 @@
+import { kickoff } from '../data/build'
 import { club } from '../data/club'
-import { kickoff, type Match } from '../data/matches'
+import type { Match, Result } from '../data/types'
 import { Crest } from './Crest'
 
 export const fmtDay = (m: Match) =>
@@ -44,7 +45,7 @@ export function MatchCard({ match, className = '' }: { match: Match; className?:
   )
 }
 
-export function ResultDot({ r, big = false }: { r: 'G' | 'E' | 'P'; big?: boolean }) {
+export function ResultDot({ r, big = false }: { r: Result; big?: boolean }) {
   const color = r === 'G' ? 'bg-emerald-500' : r === 'E' ? 'bg-amber-400 text-club-950' : 'bg-white/25'
   return big ? (
     <span className={`grid size-8 place-items-center rounded-full text-xs font-bold ${color}`}>{r === 'G' ? 'V' : r}</span>

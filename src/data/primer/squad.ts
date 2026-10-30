@@ -1,0 +1,76 @@
+import type { ClubStats } from '../build'
+import type { Position } from '../types'
+
+// Ficha oficial FFCM (sin los juveniles que solo aparecen convocados). Formato: "APELLIDOS, NOMBRE"
+export const squad: Record<string, Position> = {
+  'SALIDO MOLINA, SERGIO': 'POR',
+  'RODRIGUEZ GONZALEZ, RAUL': 'POR',
+  'ZARCO MARTINEZ, JORGE': 'DEF',
+  'MERINO FERNANDEZ, IVAN': 'DEF',
+  'HEREDIA MORALES, ISMAEL': 'DEF',
+  'ESCUDERO RIVAS, SAMUEL': 'DEF',
+  'ESCUDERO RIVAS, ISAAC': 'DEF',
+  'MONEDERO ALBERCA, CARLOS': 'DEF',
+  'RAMOS LOPEZ, JOSE LUIS': 'DEF',
+  'RAMOS LOPEZ, JAVIER': 'DEF',
+  'DELGADO AYUSO MORALES, DIEGO': 'MED',
+  'VILLEGAS PULPON, VICTOR': 'MED',
+  'FELGUERA PEREA, DANIEL': 'MED',
+  'PLATAS MUÑOZ, JESUS': 'MED',
+  'FERNANDEZ MUÑOZ, ALVARO': 'MED',
+  'MUÑOZ PLIEGO, PABLO': 'MED',
+  'YUSTE MUÑOZ, ADRIAN': 'MED',
+  'PORRERO MOTA, HUGO': 'MED',
+  'BOUNAB CHARQI, ISMAEL': 'MED',
+  'HERREROS RODRIGUEZ, ALEJANDRO': 'DEL',
+  'PULPON BUENDIA, REYES': 'DEL',
+  'SANCHEZ ALBERCA, JAIME': 'DEL',
+  'MOURA FERREIRA, JACKSON': 'DEL',
+  'CASERO VILLALGORDO, JAVIER': 'DEL',
+  'DELGADO FERNANDEZ CAÑADAS, GUILLERMO': 'DEL',
+}
+
+// Dorsal y nombre deportivo según el club (Excel de estadísticas). [dorsal, nombre, apodo?]
+export const profiles: Record<string, [number, string, string?]> = {
+  'RODRIGUEZ GONZALEZ, RAUL': [1, 'Raúl Rodríguez', 'Pincho'],
+  'ZARCO MARTINEZ, JORGE': [2, 'Jorge Zarco'],
+  'MERINO FERNANDEZ, IVAN': [3, 'Iván Merino'],
+  'ESCUDERO RIVAS, ISAAC': [4, 'Isaac Escudero'],
+  'HEREDIA MORALES, ISMAEL': [5, 'Ismael Heredia'],
+  'DELGADO AYUSO MORALES, DIEGO': [6, 'Diego Delgado'],
+  'HERREROS RODRIGUEZ, ALEJANDRO': [7, 'Alejandro Herreros'],
+  'VILLEGAS PULPON, VICTOR': [8, 'Víctor Villegas'],
+  'MOURA FERREIRA, JACKSON': [9, 'Jackson Moura'],
+  'FERNANDEZ MUÑOZ, ALVARO': [10, 'Álvaro Fernández'],
+  'PULPON BUENDIA, REYES': [11, 'Reyes Pulpón'],
+  'RAMOS LOPEZ, JOSE LUIS': [12, 'Joselu Ramos'],
+  'SALIDO MOLINA, SERGIO': [13, 'Sergio Salido', 'Pato'],
+  'YUSTE MUÑOZ, ADRIAN': [14, 'Adrián Yuste'],
+  'DELGADO FERNANDEZ CAÑADAS, GUILLERMO': [15, 'Guillermo Delgado'],
+  'ESCUDERO RIVAS, SAMUEL': [16, 'Samu Escudero'],
+  'CASERO VILLALGORDO, JAVIER': [17, 'Javi Casero'],
+  'SANCHEZ ALBERCA, JAIME': [18, 'Jaime Sánchez'],
+  'MONEDERO ALBERCA, CARLOS': [19, 'Carlos Monedero'],
+  'PLATAS MUÑOZ, JESUS': [20, 'Jesús Platas'],
+  'BOUNAB CHARQI, ISMAEL': [21, 'Ismael Bounab'],
+  'RAMOS LOPEZ, JAVIER': [22, 'Javi Ramos'],
+  'FELGUERA PEREA, DANIEL': [23, 'Dani Perea'],
+  'PORRERO MOTA, HUGO': [24, 'Hugo Porrero'],
+  'MUÑOZ PLIEGO, PABLO': [25, 'Pablo Muñoz'],
+}
+
+// Lo que no sale en las actas de la FFCM se apunta a mano (Excel del club)
+export const clubStats: Record<string, ClubStats> = {
+  'ZARCO MARTINEZ, JORGE': { assists: 2, yellow: 1 },
+  'HEREDIA MORALES, ISMAEL': { assists: 1 },
+  'DELGADO FERNANDEZ CAÑADAS, GUILLERMO': { assists: 1 },
+  'ESCUDERO RIVAS, SAMUEL': { assists: 1, yellow: 1 },
+  'FELGUERA PEREA, DANIEL': { assists: 1 },
+  'SALIDO MOLINA, SERGIO': { saves: 7 },
+  'DELGADO AYUSO MORALES, DIEGO': { yellow: 3 },
+  'HERREROS RODRIGUEZ, ALEJANDRO': { yellow: 1 },
+  'FERNANDEZ MUÑOZ, ALVARO': { yellow: 2 },
+  'RAMOS LOPEZ, JOSE LUIS': { yellow: 1 },
+  'PLATAS MUÑOZ, JESUS': { yellow: 1 },
+  'BOUNAB CHARQI, ISMAEL': { yellow: 1 },
+}

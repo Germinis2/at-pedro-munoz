@@ -1,13 +1,14 @@
 import { Crest } from '../components/Crest'
 import { ResultDot } from '../components/MatchCard'
-import { club, standings, standingsRound } from '../data/club'
+import { useTeam } from '../data/teams'
 
 export function Table() {
+  const team = useTeam()
   return (
     <section>
-      <p className="label-caps">{club.league} · {club.group}</p>
+      <p className="label-caps">{team.league} · {team.group}</p>
       <h1 className="text-3xl font-bold md:text-4xl">Clasificación</h1>
-      <p className="mt-1 text-sm text-white/50">Tras la jornada {standingsRound}</p>
+      <p className="mt-1 text-sm text-white/50">Tras la jornada {team.standingsRound}</p>
       <div className="panel mt-6 overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-club-950/40 text-[11px] uppercase tracking-wider text-white/50">
@@ -25,7 +26,7 @@ export function Table() {
             </tr>
           </thead>
           <tbody>
-            {standings.map((r, i) => {
+            {team.standings.map((r, i) => {
               const dg = r.gf - r.gc
               return (
                 <tr key={r.team} className={`border-t border-white/5 ${r.ours ? 'bg-club-500/25 font-semibold' : ''}`}>

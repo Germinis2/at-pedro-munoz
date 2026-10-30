@@ -1,25 +1,6 @@
 // Datos de la FFCM (Segunda Autonómica, Grupo 3, temporada 2026/27).
 // Los jugadores se escriben tal cual aparecen en el acta: "APELLIDOS, NOMBRE".
-
-export interface Lineup {
-  starters: [number, string][]
-  bench: [number, string][]
-  subs: { min: number; in: string; out: string }[]
-  goals: { min: number; player: string | null }[] // null = gol en propia puerta del rival
-}
-
-export interface Match {
-  id: number
-  round: number
-  date: string // YYYY-MM-DD
-  time?: string // HH:MM, vacío si aún no está fijada
-  home: boolean
-  opponent: string
-  venue?: string
-  score?: { us: number; them: number }
-  acta?: number
-  lineup?: Lineup
-}
+import type { Match } from '../types'
 
 export const matches: Match[] = [
   {
@@ -108,14 +89,3 @@ export const matches: Match[] = [
   { id: 9, round: 9, date: '2026-12-13', home: true, opponent: 'C.D. Villagarcía', venue: 'Juande Ramos' },
   { id: 10, round: 10, date: '2026-12-20', home: false, opponent: 'C.P. Villarrobledo "B"' },
 ]
-
-export const kickoff = (m: Match) => new Date(`${m.date}T${m.time ?? '00:00'}`)
-
-export const upcoming = (now = new Date()) =>
-  matches.filter((m) => !m.score && kickoff(m) >= new Date(now.toDateString())).sort((a, b) => a.date.localeCompare(b.date))
-
-export const played = () =>
-  matches.filter((m) => m.score).sort((a, b) => b.date.localeCompare(a.date))
-
-export const actaUrl = (acta: number) =>
-  `https://www.ffcm.es/pnfg/NPcd/NFG_CmpPartido?cod_primaria=1000120&CodActa=${acta}&cod_acta=${acta}`

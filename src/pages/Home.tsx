@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { Crest } from '../components/Crest'
 import { MatchCard, ResultDot, fmtLongDay, fmtTime } from '../components/MatchCard'
 import { Silhouette } from '../components/Silhouette'
-import { club, teamSummary } from '../data/club'
-import { kickoff, played, upcoming } from '../data/matches'
-import { sortedPlayers } from '../data/players'
+import { kickoff, played, sortPlayers, summary, upcoming } from '../data/build'
+import { club } from '../data/club'
+import { teams, useTeam } from '../data/teams'
 import { Leaderboard } from './Stats'
 
 function useCountdown(target?: Date) {
@@ -28,11 +28,31 @@ function SectionHead({ title, to, cta = 'Ver todo' }: { title: string; to?: stri
   )
 }
 
+function TeamSwitch() {
+  return (
+    <div className="grid grid-cols-2 rounded-full border border-white/10 bg-club-950/50 p-1 text-sm font-semibold md:inline-grid md:w-80">
+      {Object.values(teams).map((t) => (
+        <NavLink
+          key={t.id}
+          to={t.base || '/'}
+          end
+          className={({ isActive }) =>
+            `rounded-full py-2.5 text-center transition-colors ${isActive ? 'bg-white text-club-800 shadow' : 'text-white/60 hover:text-white'}`
+          }
+        >
+          {t.label}
+        </NavLink>
+      ))}
+    </div>
+  )
+}
+
 export function Home() {
-  const next = upcoming()[0]
-  const results = played().slice(0, 3)
+  const team = useTeam()
+  const next = upcoming(team.matches)[0]
+  const results = played(team.matches).slice(0, 3)
   const cd = useCountdown(next?.time ? kickoff(next) : undefined)
-  const s = teamSummary
+  const s = summary(team.standings)
 
   const tiles = [
     { label: 'Posición', value: `${s.position}º`, hint: `de ${s.teams}` },
@@ -43,16 +63,18 @@ export function Home() {
 
   return (
     <div className="space-y-10 md:space-y-14">
+      <TeamSwitch />
+
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-club-600 via-club-800 to-club-950 p-5 md:p-10">
+      <section className="relative -mt-4 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-club-600 via-club-800 to-club-950 p-5 md:-mt-6 md:p-10">
         <img src={club.crest} alt="" aria-hidden className="pointer-events-none absolute -right-16 -top-10 w-72 opacity-[0.07] md:-right-10 md:w-[420px]" />
         <div className="relative md:flex md:items-end md:justify-between md:gap-10">
           <div className="flex items-center gap-4 md:gap-6">
             <Crest className="size-20 shrink-0 drop-shadow-xl md:size-36" />
             <div>
-              <p className="label-caps text-club-100/80">{club.league} · {club.group}</p>
+              <p className="label-caps text-club-100/80">{team.league} · {team.group}</p>
               <h1 className="text-3xl font-bold leading-tight md:text-5xl">{club.shortName}</h1>
-              <p className="text-sm text-white/70">{club.region} · Temporada {club.season}</p>
+              <p className="text-sm text-white/70">{team.full ? club.region : team.label} · Temporada {club.season}</p>
             </div>
           </div>
           <div className="mt-6 grid grid-cols-4 gap-2 md:mt-0 md:w-[440px] md:gap-3">
@@ -75,7 +97,7 @@ export function Home() {
         {/* Próximo partido */}
         {next && (
           <section>
-            <SectionHead title="Próximo partido" to="/partidos" cta="Calendario" />
+            <SectionHead title="Próximo partido" to={`${team.base}/partidos`} cta="Calendario" />
             <div className="panel p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">Jornada {next.round}</span>
@@ -116,7 +138,7 @@ export function Home() {
 
         {/* Últimos resultados */}
         <section>
-          <SectionHead title="Últimos resultados" to="/partidos" />
+          <SectionHead title="Últimos resultados" to={`${team.base}/partidos`} />
           <div className="space-y-3">{results.map((m) => <MatchCard key={m.id} match={m} />)}</div>
           <div className="panel mt-4 flex items-center justify-between gap-3 p-4">
             <div>
@@ -135,11 +157,11 @@ export function Home() {
 
       {/* Plantilla */}
       <section>
-        <SectionHead title="Plantilla" to="/plantilla" />
+        <SectionHead title="Plantilla" to={`${team.base}/plantilla`} />
         <ul className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
-          {sortedPlayers.map((p) => (
+          {sortPlayers(team.players).map((p) => (
             <li key={p.id} className="w-32 shrink-0 snap-start md:w-40">
-              <Link to={`/jugador/${p.id}`} className="panel group relative block overflow-hidden pt-3">
+              <Link to={`${team.base}/jugador/${p.id}`} className="panel group relative block overflow-hidden pt-3">
                 <span className="absolute left-2.5 top-1.5 text-xl font-bold text-white/30">{p.number ?? ''}</span>
                 <Silhouette className="mx-auto h-28 w-full transition-transform group-hover:scale-105 md:h-36" />
                 <p className="truncate border-t border-white/10 bg-club-950/40 px-2.5 py-2 text-xs font-semibold">{p.firstName} {p.lastName}</p>

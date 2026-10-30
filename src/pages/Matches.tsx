@@ -1,13 +1,15 @@
 import { MatchCard } from '../components/MatchCard'
-import { played, upcoming } from '../data/matches'
+import { played, upcoming } from '../data/build'
+import { useTeam } from '../data/teams'
 
 export function Matches() {
-  const next = upcoming()
-  const past = played()
+  const team = useTeam()
+  const next = upcoming(team.matches)
+  const past = played(team.matches)
   return (
     <section className="space-y-10">
       <div>
-        <p className="label-caps">Temporada 2026/27</p>
+        <p className="label-caps">{team.label} · Temporada 2026/27</p>
         <h1 className="text-3xl font-bold md:text-4xl">Partidos</h1>
       </div>
       <div>
