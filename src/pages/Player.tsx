@@ -5,9 +5,9 @@ import { Shirt } from '../components/Shirt'
 import { Silhouette } from '../components/Silhouette'
 import { StatRing } from '../components/StatRing'
 import { upcoming } from '../data/matches'
-import { players, positionLabels, sortedPlayers } from '../data/players'
+import { assistsTracked, players, positionLabels, sortedPlayers } from '../data/players'
 
-function Stat({ value, label }: { value: number; label: string }) {
+function Stat({ value, label }: { value: number | string; label: string }) {
   return (
     <div>
       <p className="text-4xl font-semibold tabular-nums md:text-5xl">{value}</p>
@@ -45,7 +45,7 @@ export function Player() {
         { value: p.appearances, label: 'Partidos' },
         { value: p.minutes, label: 'Minutos' },
         { value: p.goals, label: 'Goles' },
-        { value: p.assists, label: 'Asistencias' },
+        { value: assistsTracked ? p.assists : '–', label: 'Asistencias' },
       ]
 
   const rings = isGK
@@ -55,7 +55,9 @@ export function Player() {
       ]
     : [
         { value: p.goals, max: maxOf('goals'), label: 'Goles' },
-        { value: p.assists, max: maxOf('assists'), label: 'Asistencias' },
+        assistsTracked
+          ? { value: p.assists, max: maxOf('assists'), label: 'Asistencias' }
+          : { value: p.appearances, max: maxOf('appearances'), label: 'Partidos' },
       ]
 
   const navBtn = 'grid size-12 place-items-center rounded-full bg-white/10 backdrop-blur transition hover:bg-white/20'
@@ -68,7 +70,7 @@ export function Player() {
           <span className="rounded bg-club-500 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em]">
             {positionLabels[p.position].one}
           </span>
-          <span className="text-sm font-medium text-white/70">Dorsal {p.number}</span>
+          {p.number && <span className="text-sm font-medium text-white/70">Dorsal {p.number}</span>}
         </div>
 
         <div className="mt-3 flex items-center gap-5">

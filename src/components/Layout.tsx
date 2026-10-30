@@ -23,10 +23,10 @@ export function Layout() {
       <header className="sticky top-0 z-40 border-b border-white/5 bg-club-950/70 pt-[env(safe-area-inset-top)] backdrop-blur-lg">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-10 px-4 md:h-20 md:px-8">
           <NavLink to="/" className="flex items-center gap-3">
-            <Crest className="h-10 w-9 md:h-12 md:w-11" />
+            <Crest className="size-11 md:size-13" />
             <div className="leading-tight">
               <p className="text-sm font-bold md:text-base">{club.name}</p>
-              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-club-300">{club.league}</p>
+              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-club-300">{club.league} · {club.group}</p>
             </div>
           </NavLink>
           <nav className="ml-auto hidden md:block">

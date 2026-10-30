@@ -91,13 +91,13 @@ export function Squad() {
                 }`}
               >
                 <span className="absolute -right-2 top-2 text-[120px] font-extrabold leading-none text-white/[0.06] md:text-[150px]">
-                  {p.number}
+                  {p.number ?? ''}
                 </span>
                 <Silhouette className="relative mx-auto mt-6 h-[260px] w-full md:h-[330px]" />
                 <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-club-950 via-club-950/70 to-transparent" />
                 <div className="absolute inset-x-0 bottom-4 text-center">
                   <span className="mx-auto mb-2 grid size-9 place-items-center rounded-full bg-club-500 text-sm font-bold shadow-lg shadow-club-950/50">
-                    {p.number}
+                    {p.number ?? '–'}
                   </span>
                   {!isActive && <p className="text-sm font-semibold">{p.firstName} {p.lastName}</p>}
                 </div>
@@ -111,7 +111,7 @@ export function Squad() {
         <div className="relative mt-5 text-center">
           <p className="text-lg font-medium text-white/80 md:text-2xl">{current.firstName}</p>
           <h2 className="text-5xl font-bold leading-none tracking-tight md:text-7xl">{current.lastName}</h2>
-          <p className="label-caps mt-3">{positionLabels[current.position].one} · Dorsal {current.number}</p>
+          <p className="label-caps mt-3">{positionLabels[current.position].one}{current.number && ` · Dorsal ${current.number}`}</p>
           <div className="mt-5 flex items-center justify-center gap-3">
             <button onClick={() => go(-1)} disabled={active === 0} className="grid size-11 place-items-center rounded-full bg-white/10 transition hover:bg-white/20 disabled:opacity-30" aria-label="Anterior">
               <ChevronLeft className="size-5" />
@@ -139,7 +139,7 @@ export function Squad() {
                   .map((p) => (
                     <li key={p.id}>
                       <Link to={`/jugador/${p.id}`} className="panel group relative block overflow-hidden pt-3 transition hover:bg-white/10">
-                        <span className="absolute left-3 top-2 text-2xl font-bold text-white/30">{p.number}</span>
+                        <span className="absolute left-3 top-2 text-2xl font-bold text-white/30">{p.number ?? ''}</span>
                         <Silhouette className="mx-auto h-28 w-full transition-transform duration-300 group-hover:scale-105" />
                         <div className="border-t border-white/10 bg-club-950/40 px-3 py-2.5">
                           <p className="truncate text-sm font-semibold">{p.firstName} {p.lastName}</p>
