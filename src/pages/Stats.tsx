@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom'
 import { Silhouette } from '../components/Silhouette'
 import { assistsTracked, players, positionLabels } from '../data/players'
 
-type StatKey = 'goals' | 'assists' | 'cleanSheets' | 'minutes' | 'appearances'
+type StatKey = 'goals' | 'assists' | 'cleanSheets' | 'saves' | 'minutes' | 'appearances' | 'yellowCards' | 'redCards'
 
 export function Leaderboard({ title, stat, limit = 5, compact = false }: { title: string; stat: StatKey; limit?: number; compact?: boolean }) {
-  const pool = stat === 'cleanSheets' ? players.filter((p) => p.position === 'POR') : players
+  const pool = stat === 'cleanSheets' || stat === 'saves' ? players.filter((p) => p.position === 'POR') : players
   const ranked = [...pool].filter((p) => p[stat] > 0).sort((a, b) => b[stat] - a[stat]).slice(0, limit)
   const pending = stat === 'assists' && !assistsTracked
 
@@ -50,10 +50,15 @@ export function Stats() {
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Leaderboard title="Goleadores" stat="goals" limit={10} />
         <Leaderboard title="Asistencias" stat="assists" limit={10} />
-        <Leaderboard title="Porterías a 0" stat="cleanSheets" limit={5} />
         <Leaderboard title="Más minutos" stat="minutes" limit={10} />
+        <Leaderboard title="Tarjetas amarillas" stat="yellowCards" limit={10} />
+        <Leaderboard title="Porterías a 0" stat="cleanSheets" limit={5} />
+        <Leaderboard title="Paradas" stat="saves" limit={5} />
+        <Leaderboard title="Tarjetas rojas" stat="redCards" limit={5} />
       </div>
-      <p className="mt-6 text-xs text-white/40">Partidos, minutos y goles calculados a partir de las actas oficiales de la FFCM.</p>
+      <p className="mt-6 text-xs text-white/40">
+        Partidos, minutos y goles calculados a partir de las actas oficiales de la FFCM. Asistencias, paradas y tarjetas: datos del club.
+      </p>
     </section>
   )
 }

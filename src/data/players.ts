@@ -24,13 +24,15 @@ export interface Player {
   goals: number
   assists: number
   cleanSheets: number
+  saves: number
+  yellowCards: number
+  redCards: number
 }
 
-// Ficha oficial FFCM + porteros que aparecen en las actas. Formato: "APELLIDOS, NOMBRE"
+// Ficha oficial FFCM (sin los juveniles que solo aparecen convocados). Formato: "APELLIDOS, NOMBRE"
 const squad: Record<string, Position> = {
   'SALIDO MOLINA, SERGIO': 'POR',
-  'GONZALEZ FERNANDEZ, ISMAEL': 'POR',
-  'ROSU BASCUÑANA, ALEXIS': 'POR',
+  'RODRIGUEZ GONZALEZ, RAUL': 'POR',
   'ZARCO MARTINEZ, JORGE': 'DEF',
   'MERINO FERNANDEZ, IVAN': 'DEF',
   'HEREDIA MORALES, ISMAEL': 'DEF',
@@ -38,7 +40,6 @@ const squad: Record<string, Position> = {
   'ESCUDERO RIVAS, ISAAC': 'DEF',
   'MONEDERO ALBERCA, CARLOS': 'DEF',
   'RAMOS LOPEZ, JOSE LUIS': 'DEF',
-  'RODRIGUEZ GONZALEZ, RAUL': 'DEF',
   'RAMOS LOPEZ, JAVIER': 'DEF',
   'DELGADO AYUSO MORALES, DIEGO': 'MED',
   'VILLEGAS PULPON, VICTOR': 'MED',
@@ -86,15 +87,23 @@ const profiles: Record<string, [number, string, string?]> = {
   'MUÑOZ PLIEGO, PABLO': [25, 'Pablo Muñoz'],
 }
 
-// Las actas de la FFCM no recogen asistencias: se apuntan a mano (Excel del club)
-const assists: Record<string, number> = {
-  'ZARCO MARTINEZ, JORGE': 2,
-  'HEREDIA MORALES, ISMAEL': 1,
-  'DELGADO FERNANDEZ CAÑADAS, GUILLERMO': 1,
-  'ESCUDERO RIVAS, SAMUEL': 1,
-  'FELGUERA PEREA, DANIEL': 1,
+// Lo que no sale en las actas de la FFCM se apunta a mano (Excel del club)
+type ClubStats = { assists?: number; saves?: number; yellow?: number; red?: number }
+const clubStats: Record<string, ClubStats> = {
+  'ZARCO MARTINEZ, JORGE': { assists: 2, yellow: 1 },
+  'HEREDIA MORALES, ISMAEL': { assists: 1 },
+  'DELGADO FERNANDEZ CAÑADAS, GUILLERMO': { assists: 1 },
+  'ESCUDERO RIVAS, SAMUEL': { assists: 1, yellow: 1 },
+  'FELGUERA PEREA, DANIEL': { assists: 1 },
+  'SALIDO MOLINA, SERGIO': { saves: 7 },
+  'DELGADO AYUSO MORALES, DIEGO': { yellow: 3 },
+  'HERREROS RODRIGUEZ, ALEJANDRO': { yellow: 1 },
+  'FERNANDEZ MUÑOZ, ALVARO': { yellow: 2 },
+  'RAMOS LOPEZ, JOSE LUIS': { yellow: 1 },
+  'PLATAS MUÑOZ, JESUS': { yellow: 1 },
+  'BOUNAB CHARQI, ISMAEL': { yellow: 1 },
 }
-export const assistsTracked = Object.keys(assists).length > 0
+export const assistsTracked = Object.values(clubStats).some((s) => s.assists)
 
 const capitalize = (s: string) => s.toLowerCase().replace(/(^|\s)\p{L}/gu, (c) => c.toUpperCase())
 
@@ -139,7 +148,10 @@ export const players: Player[] = Object.entries(squad).map(([raw, position]) => 
     nickname,
     fullName: `${name} ${surnames}`,
     position,
-    assists: assists[raw] ?? 0,
+    assists: clubStats[raw]?.assists ?? 0,
+    saves: clubStats[raw]?.saves ?? 0,
+    yellowCards: clubStats[raw]?.yellow ?? 0,
+    redCards: clubStats[raw]?.red ?? 0,
     ...stats,
     number, // solo el dorsal oficial del club; en las actas varía de un partido a otro
   }

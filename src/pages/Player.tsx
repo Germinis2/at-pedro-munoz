@@ -33,13 +33,14 @@ export function Player() {
   const prev = sortedPlayers[index - 1]
   const next = sortedPlayers[index + 1]
   const isGK = p.position === 'POR'
-  const maxOf = (key: 'goals' | 'assists' | 'cleanSheets' | 'appearances') => Math.max(...players.map((x) => x[key]))
+  const maxOf = (key: 'goals' | 'assists' | 'cleanSheets' | 'appearances' | 'saves') => Math.max(...players.map((x) => x[key]))
 
   const stats = isGK
     ? [
         { value: p.appearances, label: 'Partidos' },
         { value: p.minutes, label: 'Minutos' },
         { value: p.cleanSheets, label: 'Porterías a 0' },
+        { value: p.saves, label: 'Paradas' },
       ]
     : [
         { value: p.appearances, label: 'Partidos' },
@@ -51,7 +52,7 @@ export function Player() {
   const rings = isGK
     ? [
         { value: p.cleanSheets, max: maxOf('cleanSheets'), label: 'Porterías a 0' },
-        { value: p.appearances, max: maxOf('appearances'), label: 'Partidos' },
+        { value: p.saves, max: maxOf('saves'), label: 'Paradas' },
       ]
     : [
         { value: p.goals, max: maxOf('goals'), label: 'Goles' },
@@ -88,8 +89,20 @@ export function Player() {
 
         <div className="panel mt-8 p-5 md:p-7">
           <p className="label-caps mb-5">Temporada 2026/27</p>
-          <div className={`grid gap-6 ${isGK ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
             {stats.map((s) => <Stat key={s.label} {...s} />)}
+          </div>
+          <div className="mt-6 flex gap-5 border-t border-white/10 pt-5 text-sm">
+            <span className="flex items-center gap-2">
+              <span className="h-5 w-3.5 rounded-[3px] bg-amber-400" aria-hidden />
+              <b className="text-lg tabular-nums">{p.yellowCards}</b>
+              <span className="text-club-300">Amarillas</span>
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="h-5 w-3.5 rounded-[3px] bg-red-600" aria-hidden />
+              <b className="text-lg tabular-nums">{p.redCards}</b>
+              <span className="text-club-300">Rojas</span>
+            </span>
           </div>
 
           <div className="mt-8 flex items-center justify-between">

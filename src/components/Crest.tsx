@@ -1,9 +1,13 @@
-import { club as clubData } from '../data/club'
+import { club as clubData, crestFor } from '../data/club'
 
-// Escudo del club, o un escudo genérico para los rivales
-export function Crest({ className = 'size-10', club = true }: { className?: string; club?: boolean }) {
+// Escudo del club, el de un rival (por nombre) o uno genérico si no lo tenemos
+export function Crest({ className = 'size-10', club = true, team }: { className?: string; club?: boolean; team?: string }) {
   if (club) {
     return <img src={clubData.crest} alt={`Escudo ${clubData.name}`} className={`object-contain ${className}`} />
+  }
+  const src = team && crestFor(team)
+  if (src) {
+    return <img src={src} alt={`Escudo ${team}`} loading="lazy" className={`object-contain ${className}`} />
   }
   return (
     <svg viewBox="0 0 64 72" className={className} aria-hidden>

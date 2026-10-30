@@ -32,7 +32,7 @@ export function Table() {
                   <td className="py-3 pl-3 text-white/60 md:pl-4">{i + 1}</td>
                   <td className="max-w-0 py-3">
                     <span className="flex items-center gap-2.5">
-                      <Crest club={!!r.ours} className="size-7 shrink-0" />
+                      <Crest club={!!r.ours} team={r.team} className="size-7 shrink-0" />
                       <span className="truncate">{r.team}</span>
                     </span>
                   </td>

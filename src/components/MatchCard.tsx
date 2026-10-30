@@ -11,7 +11,7 @@ export const fmtTime = (m: Match) => m.time ?? 'Por confirmar'
 function Team({ name, ours }: { name: string; ours: boolean }) {
   return (
     <div className="flex min-w-0 flex-1 flex-col items-center gap-2 text-center">
-      <Crest club={ours} className="size-12" />
+      <Crest club={ours} team={name} className="size-12" />
       <p className="line-clamp-2 text-xs font-semibold leading-tight">{name}</p>
     </div>
   )
