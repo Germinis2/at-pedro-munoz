@@ -15,18 +15,22 @@ export async function fetchResults(poll: number) {
   return (data as { player_id: string; votes: number }[]).map((r) => ({ ...r, votes: Number(r.votes) }))
 }
 
+// 32 caracteres hexadecimales aleatorios. crypto.randomUUID solo existe en páginas https/localhost;
+// getRandomValues funciona también en http (p. ej. al probar desde el móvil por la red local)
+const randomId = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('')
+
 // Identificador anónimo del dispositivo (un voto por votación y dispositivo)
 function deviceId() {
   const key = 'apm-voter'
   try {
     let id = localStorage.getItem(key)
     if (!id) {
-      id = crypto.randomUUID()
+      id = randomId()
       localStorage.setItem(key, id)
     }
     return id
   } catch {
-    return crypto.randomUUID()
+    return randomId()
   }
 }
 
