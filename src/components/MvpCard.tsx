@@ -1,0 +1,102 @@
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { candidates, fetchResults, vote, votedFor } from '../data/mvp'
+import { useTeam } from '../data/teams'
+import { PlayerImage } from './PlayerImage'
+
+type Results = { player_id: string; votes: number }[]
+
+export function MvpCard() {
+  const team = useTeam()
+  const poll = team.polls[0] // la más reciente
+  const match = poll && team.matches.find((m) => m.id === poll.match_id)
+  const [results, setResults] = useState<Results | null>(null)
+  const [voted, setVoted] = useState<string | null>(null)
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    if (!poll) return
+    setVoted(votedFor(poll.id))
+    fetchResults(poll.id).then(setResults).catch(() => setResults([]))
+  }, [poll])
+
+  if (!poll || !match) return null
+  const list = candidates(match, team.players)
+  const total = results?.reduce((a, r) => a + r.votes, 0) ?? 0
+  const byId = (id: string) => team.players.find((p) => p.id === id)
+  const pct = (id: string) => (total ? Math.round(((results?.find((r) => r.player_id === id)?.votes ?? 0) / total) * 100) : 0)
+  const open = poll.status === 'open'
+  const showResults = !open || !!voted
+
+  const submit = async (id: string) => {
+    setBusy(true)
+    setError('')
+    try {
+      await vote(poll.id, id)
+      setVoted(id)
+      setResults(await fetchResults(poll.id))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo votar')
+    }
+    setBusy(false)
+  }
+
+  const head = (
+    <div className="mb-3 flex items-center justify-between">
+      <h2 className="label-caps">{open ? 'Vota al MVP' : 'MVP del último partido'}</h2>
+      <span className="text-xs font-semibold text-white/50">Jornada {match.round} · {match.opponent}</span>
+    </div>
+  )
+
+  // Votación cerrada: ganador destacado
+  if (!open) {
+    const winner = results?.[0] && byId(results[0].player_id)
+    if (!winner) return null
+    return (
+      <section>
+        {head}
+        <Link to={`${team.base}/jugador/${winner.id}`} className="panel flex items-center gap-4 overflow-hidden bg-gradient-to-r from-club-600/60 to-club-900/40 p-4">
+          <span className="size-20 shrink-0 overflow-hidden rounded-full border-2 border-amber-300 bg-club-800">
+            <PlayerImage player={winner} className="size-full" />
+          </span>
+          <div>
+            <span className="rounded-full bg-amber-300 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-club-950">MVP · Jornada {match.round}</span>
+            <p className="mt-1.5 text-2xl font-bold leading-tight">{winner.firstName} {winner.lastName}</p>
+            <p className="text-sm text-white/60">{pct(winner.id)}% de {total} votos</p>
+          </div>
+        </Link>
+      </section>
+    )
+  }
+
+  return (
+    <section>
+      {head}
+      <div className="panel p-4">
+        <p className="mb-3 text-sm text-white/60">{showResults ? `Gracias por votar · ${total} votos` : '¿Quién fue el mejor? Un voto por dispositivo.'}</p>
+        <ul className="grid gap-2 sm:grid-cols-2">
+          {list.map((p) => (
+            <li key={p.id}>
+              <button
+                disabled={busy || showResults}
+                onClick={() => submit(p.id)}
+                className={`relative flex w-full items-center gap-3 overflow-hidden rounded-xl border p-2 text-left transition ${
+                  voted === p.id ? 'border-amber-300 bg-amber-300/10' : 'border-white/10 bg-white/5 enabled:hover:bg-white/10'
+                }`}
+              >
+                {showResults && <span className="absolute inset-y-0 left-0 bg-white/10" style={{ width: `${pct(p.id)}%` }} aria-hidden />}
+                <span className="relative size-10 shrink-0 overflow-hidden rounded-full bg-club-800">
+                  <PlayerImage player={p} className="size-full" />
+                </span>
+                <span className="relative min-w-0 flex-1 truncate text-sm font-semibold">{p.firstName} {p.lastName}</span>
+                {showResults && <span className="relative text-sm font-bold tabular-nums">{pct(p.id)}%</span>}
+              </button>
+            </li>
+          ))}
+        </ul>
+        {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
+      </div>
+    </section>
+  )
+}

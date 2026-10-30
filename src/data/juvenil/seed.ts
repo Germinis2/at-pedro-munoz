@@ -1,7 +1,7 @@
 // Datos de la FFCM (Juvenil Territorial, Grupo 3, temporada 2026/27).
 // Los jugadores se escriben tal cual aparecen en el acta: "APELLIDOS, NOMBRE".
-import { buildPlayers } from '../build'
-import type { Match, Position, Standing, Team } from '../types'
+import { makeSeed } from '../seed.ts'
+import type { Match, Position, Standing } from '../types'
 
 // Ficha oficial FFCM. Posición null = pendiente de que el club la confirme.
 const squad: Record<string, Position | null> = {
@@ -147,15 +147,9 @@ const standings: Standing[] = [
   { team: 'E.F.B. Atlético Valdepeñas', pts: 1, pj: 5, g: 0, e: 1, p: 4, gf: 6, gc: 27, form: ['P', 'P', 'P', 'E', 'P'] },
 ]
 
-export const juvenil: Team = {
-  id: 'juvenil',
-  label: 'Juvenil',
-  base: '/juvenil',
-  league: 'Juvenil Territorial',
-  group: 'Grupo 3',
+export const juvenilSeed = makeSeed({
+  team: { id: 'juvenil', label: 'Juvenil', league: 'Juvenil Territorial', grp: 'Grupo 3', full_stats: false, standings_round: 5 },
+  squad,
   matches,
   standings,
-  standingsRound: 5,
-  players: buildPlayers({ team: 'juvenil', squad, matches }),
-  full: false,
-}
+})

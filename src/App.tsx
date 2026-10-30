@@ -1,7 +1,7 @@
+import { lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
-import { TeamProvider, teams } from './data/teams'
-import type { Team } from './data/types'
+import { TeamProvider, TeamsProvider } from './data/teams'
 import { Home } from './pages/Home'
 import { Matches } from './pages/Matches'
 import { Player } from './pages/Player'
@@ -9,10 +9,13 @@ import { Squad } from './pages/Squad'
 import { Stats } from './pages/Stats'
 import { Table } from './pages/Table'
 
+// El panel de administración se carga aparte: el público no descarga su código
+const Admin = lazy(() => import('./admin/Admin'))
+
 // Mismas páginas para cada equipo: el primer equipo en "/" y el juvenil en "/juvenil"
-const teamRoutes = (team: Team) => (
+const teamRoutes = (team: 'primer' | 'juvenil', path: string) => (
   <Route
-    path={team.base || '/'}
+    path={path}
     element={
       <TeamProvider team={team}>
         <Layout />
@@ -31,9 +34,19 @@ const teamRoutes = (team: Team) => (
 
 export default function App() {
   return (
-    <Routes>
-      {teamRoutes(teams.primer)}
-      {teamRoutes(teams.juvenil)}
-    </Routes>
+    <TeamsProvider>
+      <Routes>
+        <Route
+          path="/admin/*"
+          element={
+            <Suspense fallback={<p className="p-10 text-center text-white/50">Cargando…</p>}>
+              <Admin />
+            </Suspense>
+          }
+        />
+        {teamRoutes('primer', '/')}
+        {teamRoutes('juvenil', '/juvenil')}
+      </Routes>
+    </TeamsProvider>
   )
 }

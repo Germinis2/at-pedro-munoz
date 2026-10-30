@@ -1,5 +1,6 @@
+import { splitFfcm } from './names'
 import { photoFor } from './photos'
-import type { Match, Player, Position, Standing } from './types'
+import type { Match, MatchRow, MvpPoll, Player, PlayerRow, Position, Seed, Standing, Team } from './types'
 
 export const positionLabels: Record<Position, { one: string; many: string }> = {
   POR: { one: 'Portero', many: 'Porteros' },
@@ -10,24 +11,14 @@ export const positionLabels: Record<Position, { one: string; many: string }> = {
 export const positionOrder: Position[] = ['POR', 'DEF', 'MED', 'DEL']
 export const positionLabel = (p: Position | null) => (p ? positionLabels[p].one : 'Jugador')
 
-export type ClubStats = { assists?: number; saves?: number; yellow?: number; red?: number }
-
-const capitalize = (s: string) => s.toLowerCase().replace(/(^|\s)\p{L}/gu, (c) => c.toUpperCase())
-
-const slug = (s: string) =>
-  s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-
 const FULL = 90
 
 // Partidos, minutos, goles y porterías a 0 a partir de las actas
 function statsFor(raw: string, keeper: boolean, matches: Match[]) {
-  let number: number | null = null
   let appearances = 0, starts = 0, minutes = 0, goals = 0, cleanSheets = 0
-  for (const m of [...matches].sort((a, b) => a.date.localeCompare(b.date))) {
+  for (const m of matches) {
     const l = m.lineup
     if (!l || !m.score) continue
-    const listed = [...l.starters, ...l.bench].find(([, n]) => n === raw)
-    if (listed) number = listed[0]
     const started = l.starters.some(([, n]) => n === raw)
     const subIn = l.subs.find((s) => s.in === raw)
     const subOut = l.subs.find((s) => s.out === raw)
@@ -40,47 +31,58 @@ function statsFor(raw: string, keeper: boolean, matches: Match[]) {
     goals += l.goals.filter((g) => g.player === raw).length
     if (keeper && started && !subOut && m.score.them === 0) cleanSheets++
   }
-  return { number, appearances, starts, minutes, goals, cleanSheets }
+  return { appearances, starts, minutes, goals, cleanSheets }
 }
 
-export function buildPlayers({
-  team,
-  squad,
-  matches,
-  profiles = {},
-  clubStats = {},
-}: {
-  team: string // carpeta de fotos
-  squad: Record<string, Position | null> // "APELLIDOS, NOMBRE" como en la FFCM
-  matches: Match[]
-  profiles?: Record<string, [number, string, string?]> // [dorsal, nombre deportivo, apodo?]
-  clubStats?: Record<string, ClubStats>
-}): Player[] {
-  const useProfiles = Object.keys(profiles).length > 0
-  return Object.entries(squad).map(([raw, position]) => {
-    const [surnames, name] = raw.split(',').map((s) => capitalize(s.trim()))
-    const [number, display, nickname] = profiles[raw] ?? [null, `${name} ${surnames.split(' ')[0]}`]
-    const [first, ...rest] = display.split(' ')
-    const stats = statsFor(raw, position === 'POR', matches)
-    const id = slug(`${name} ${surnames}`)
-    return {
-      id,
-      photo: photoFor(team, id),
-      ffcm: raw,
-      firstName: first,
-      lastName: rest.join(' '),
-      nickname,
-      fullName: `${name} ${surnames}`,
-      position,
-      assists: clubStats[raw]?.assists ?? 0,
-      saves: clubStats[raw]?.saves ?? 0,
-      yellowCards: clubStats[raw]?.yellow ?? 0,
-      redCards: clubStats[raw]?.red ?? 0,
-      ...stats,
-      // Con dorsales oficiales del club se usan esos; si no, el del último acta
-      number: useProfiles ? number : stats.number,
-    }
-  })
+export const toMatch = (r: MatchRow): Match => ({
+  id: r.id ?? r.round,
+  round: r.round,
+  date: r.date,
+  time: r.time?.slice(0, 5) ?? undefined,
+  home: r.home,
+  opponent: r.opponent,
+  venue: r.venue ?? undefined,
+  score: r.score_us != null && r.score_them != null ? { us: r.score_us, them: r.score_them } : undefined,
+  acta: r.acta ?? undefined,
+  lineup: r.lineup ?? undefined,
+})
+
+export function buildPlayer(row: PlayerRow, matches: Match[]): Player {
+  const { name, surnames, short } = splitFfcm(row.ffcm)
+  const [first, ...rest] = (row.display_name || short).split(' ')
+  return {
+    id: row.id,
+    ffcm: row.ffcm,
+    photo: photoFor(row.team_id, row.id),
+    firstName: first,
+    lastName: rest.join(' '),
+    nickname: row.nickname ?? undefined,
+    fullName: `${name} ${surnames}`,
+    number: row.number,
+    position: row.position,
+    assists: row.assists,
+    saves: row.saves,
+    yellowCards: row.yellow_cards,
+    redCards: row.red_cards,
+    ...statsFor(row.ffcm, row.position === 'POR', matches),
+  }
+}
+
+export function buildTeam({ team, players, matches, standings }: Seed, polls: MvpPoll[] = []): Team {
+  const ms = matches.map(toMatch)
+  return {
+    id: team.id,
+    label: team.label,
+    base: team.id === 'primer' ? '' : `/${team.id}`,
+    league: team.league,
+    group: team.grp,
+    matches: ms,
+    standings: [...standings].sort((a, b) => a.rank - b.rank).map(({ team_id: _t, rank: _r, ...s }) => s as Standing),
+    standingsRound: team.standings_round,
+    players: players.map((p) => buildPlayer(p, ms)),
+    full: team.full_stats,
+    polls: polls.filter((p) => ms.some((m) => m.id === p.match_id)),
+  }
 }
 
 export const sortPlayers = (players: Player[]) =>

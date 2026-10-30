@@ -1,4 +1,4 @@
-import type { ClubStats } from '../build'
+import type { ClubStats } from '../seed.ts'
 import type { Position } from '../types'
 
 // Ficha oficial FFCM (sin los juveniles que solo aparecen convocados). Formato: "APELLIDOS, NOMBRE"

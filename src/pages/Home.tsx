@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { Crest } from '../components/Crest'
 import { MatchCard, ResultDot, fmtLongDay, fmtTime } from '../components/MatchCard'
+import { MvpCard } from '../components/MvpCard'
 import { PlayerImage } from '../components/PlayerImage'
 import { kickoff, played, sortPlayers, summary, upcoming } from '../data/build'
 import { club } from '../data/club'
-import { teams, useTeam } from '../data/teams'
+import { useTeam, useTeams } from '../data/teams'
 import { Leaderboard } from './Stats'
 
 function useCountdown(target?: Date) {
@@ -29,6 +30,7 @@ function SectionHead({ title, to, cta = 'Ver todo' }: { title: string; to?: stri
 }
 
 function TeamSwitch() {
+  const { teams } = useTeams()
   return (
     <div className="grid grid-cols-2 rounded-full border border-white/10 bg-club-950/50 p-1 text-sm font-semibold md:inline-grid md:w-80">
       {Object.values(teams).map((t) => (
@@ -92,6 +94,8 @@ export function Home() {
           <b className="text-white">{s.goalsFor - s.goalsAgainst > 0 ? '+' : ''}{s.goalsFor - s.goalsAgainst}</b>
         </p>
       </section>
+
+      <MvpCard />
 
       <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
         {/* Próximo partido */}

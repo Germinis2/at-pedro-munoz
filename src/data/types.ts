@@ -9,7 +9,7 @@ export interface Lineup {
 }
 
 export interface Match {
-  id: number
+  id: number // en Supabase; en la copia local es la jornada
   round: number
   date: string // YYYY-MM-DD
   time?: string // HH:MM, vacío si aún no está fijada
@@ -55,6 +55,66 @@ export interface Player {
   redCards: number
 }
 
+// Filas tal cual están en Supabase
+export interface TeamRow {
+  id: 'primer' | 'juvenil'
+  label: string
+  league: string
+  grp: string
+  full_stats: boolean
+  standings_round: number
+}
+
+export interface PlayerRow {
+  id: string
+  team_id: string
+  ffcm: string
+  display_name: string | null
+  nickname: string | null
+  number: number | null
+  position: Position | null
+  assists: number
+  saves: number
+  yellow_cards: number
+  red_cards: number
+}
+
+export interface MatchRow {
+  id?: number
+  team_id: string
+  round: number
+  date: string
+  time: string | null
+  home: boolean
+  opponent: string
+  venue: string | null
+  score_us: number | null
+  score_them: number | null
+  acta: number | null
+  lineup: Lineup | null
+}
+
+export interface StandingRow extends Omit<Standing, 'ours'> {
+  team_id: string
+  rank: number
+  ours: boolean
+}
+
+export interface MvpPoll {
+  id: number
+  match_id: number
+  status: 'open' | 'closed'
+  opened_at: string
+  closed_at: string | null
+}
+
+export interface Seed {
+  team: TeamRow
+  players: PlayerRow[]
+  matches: MatchRow[]
+  standings: StandingRow[]
+}
+
 export type StatKey = 'appearances' | 'minutes' | 'goals' | 'assists' | 'cleanSheets' | 'saves' | 'yellowCards' | 'redCards'
 
 export interface Team {
@@ -69,4 +129,5 @@ export interface Team {
   players: Player[]
   // El juvenil solo muestra goles y minutos
   full: boolean
+  polls: MvpPoll[]
 }

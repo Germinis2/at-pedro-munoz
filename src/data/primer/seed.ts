@@ -1,7 +1,7 @@
-import { buildPlayers } from '../build'
-import type { Standing, Team } from '../types'
-import { matches } from './matches'
-import { clubStats, profiles, squad } from './squad'
+import { makeSeed } from '../seed.ts'
+import type { Standing } from '../types'
+import { matches } from './matches.ts'
+import { clubStats, profiles, squad } from './squad.ts'
 
 // Clasificación FFCM tras la jornada 4
 const standings: Standing[] = [
@@ -21,15 +21,11 @@ const standings: Standing[] = [
   { team: 'C.D. Triana Tresjuncos', pts: 1, pj: 4, g: 0, e: 1, p: 3, gf: 3, gc: 10, form: ['P', 'E', 'P', 'P'] },
 ]
 
-export const primer: Team = {
-  id: 'primer',
-  label: 'Primer equipo',
-  base: '',
-  league: 'Segunda Autonómica',
-  group: 'Grupo 3',
+export const primerSeed = makeSeed({
+  team: { id: 'primer', label: 'Primer equipo', league: 'Segunda Autonómica', grp: 'Grupo 3', full_stats: true, standings_round: 4 },
+  squad,
+  profiles,
+  clubStats,
   matches,
   standings,
-  standingsRound: 4,
-  players: buildPlayers({ team: 'primer', squad, matches, profiles, clubStats }),
-  full: true,
-}
+})
