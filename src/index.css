@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+
+  /* Colores del club: cambiar aquí para re-tematizar toda la web */
+  --color-club-950: #1c0207;
+  --color-club-900: #33050d;
+  --color-club-800: #520a17;
+  --color-club-700: #7a1022;
+  --color-club-600: #a3162c;
+  --color-club-500: #d11f3a;
+  --color-club-300: #f08a9a;
+  --color-club-100: #fde4e8;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply min-h-dvh bg-club-950 text-white antialiased;
+    background-image:
+      radial-gradient(120% 80% at 80% 0%, var(--color-club-700) 0%, transparent 60%),
+      radial-gradient(90% 60% at 0% 100%, var(--color-club-800) 0%, transparent 60%);
+    background-attachment: fixed;
+  }
+}
+
+@utility panel {
+  @apply rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-sm;
+}
+
+@utility label-caps {
+  @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-club-300;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
