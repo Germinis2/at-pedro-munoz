@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
-import { kickoff } from '../data/build'
+import { isLive, kickoff } from '../data/build'
+import { LiveBadge } from './LiveBadge'
 import { club } from '../data/club'
 import { useTeam } from '../data/teams'
 import type { Match, Result } from '../data/types'
@@ -25,7 +26,8 @@ export function MatchCard({ match, className = '' }: { match: Match; className?:
   const us = <Team name={club.shortName} ours />
   const them = <Team name={match.opponent} ours={false} />
   const score = match.score && (match.home ? `${match.score.us} - ${match.score.them}` : `${match.score.them} - ${match.score.us}`)
-  const result = match.score && (match.score.us > match.score.them ? 'G' : match.score.us === match.score.them ? 'E' : 'P')
+  const live = isLive(match)
+  const result = !live && match.score && (match.score.us > match.score.them ? 'G' : match.score.us === match.score.them ? 'E' : 'P')
   return (
     <Link
       to={`${base}/partido/${match.id}`}
@@ -42,10 +44,14 @@ export function MatchCard({ match, className = '' }: { match: Match; className?:
             {fmtTime(match)}
           </p>
         )}
-        <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-club-300">
-          {result && <ResultDot r={result} />}
-          Jornada {match.round}
-        </p>
+        {live ? (
+          <LiveBadge match={match} className="!text-[10px]" />
+        ) : (
+          <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-club-300">
+            {result && <ResultDot r={result} />}
+            Jornada {match.round}
+          </p>
+        )}
       </div>
       {match.home ? them : us}
     </Link>

@@ -4,7 +4,8 @@ import { Crest } from '../components/Crest'
 import { MatchCard, ResultDot, fmtLongDay, fmtTime } from '../components/MatchCard'
 import { MvpCard } from '../components/MvpCard'
 import { PlayerImage } from '../components/PlayerImage'
-import { kickoff, played, sortPlayers, summary, upcoming } from '../data/build'
+import { LiveBadge } from '../components/LiveBadge'
+import { kickoff, liveMatch, played, sortPlayers, summary, upcoming } from '../data/build'
 import { club } from '../data/club'
 import { useTeam, useTeams } from '../data/teams'
 import { Leaderboard } from './Stats'
@@ -53,6 +54,7 @@ function TeamSwitch() {
 
 export function Home() {
   const team = useTeam()
+  const live = liveMatch(team.matches)
   const next = upcoming(team.matches)[0]
   const results = played(team.matches).slice(0, 3)
   const cd = useCountdown(next?.time ? kickoff(next) : undefined)
@@ -115,6 +117,16 @@ export function Home() {
           </p>
         </div>
       </section>
+
+      {live && (
+        <section>
+          <div className="mb-4 flex items-end justify-between">
+            <h2 className="section-title">Ahora mismo</h2>
+            <LiveBadge match={live} />
+          </div>
+          <MatchCard match={live} className="border-red-500/40 bg-red-500/10" />
+        </section>
+      )}
 
       <MvpCard />
 

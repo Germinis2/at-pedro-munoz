@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Crest } from '../components/Crest'
 import { BallIcon } from '../components/Icons'
+import { LiveBadge } from '../components/LiveBadge'
 import { fmtLongDay, fmtTime } from '../components/MatchCard'
+import { MvpCard } from '../components/MvpCard'
 import { PlayerImage } from '../components/PlayerImage'
-import { actaUrl } from '../data/build'
+import { actaUrl, isLive } from '../data/build'
 import { club } from '../data/club'
-import { fetchResults } from '../data/mvp'
 import { splitFfcm } from '../data/names'
 import { useTeam, useTeams } from '../data/teams'
 import type { Match, Player } from '../data/types'
@@ -30,7 +31,7 @@ function buildEvents(m: Match, name: ReturnType<typeof useNames>): Event[] {
         ? ({ kind: 'goal', min: g.min, ours: true, who: name(g.player).name, id: name(g.player).player?.id } as const)
         : ({ kind: 'goal', min: g.min, ours: true, who: 'Gol en propia puerta', ownGoal: true } as const),
     ),
-    ...(l.rivalGoals ?? []).map((g) => ({ kind: 'goal', min: g.min, ours: false, who: splitFfcm(g.player).short }) as const),
+    ...(l.rivalGoals ?? []).map((g) => ({ kind: 'goal', min: g.min, ours: false, who: g.player ? splitFfcm(g.player).short : 'Gol del rival' }) as const),
     ...l.subs.map((s) => ({ kind: 'sub', min: s.min, ours: true, inName: name(s.in).name, outName: name(s.out).name }) as const),
     ...(l.rival?.subs ?? []).map(
       (s) => ({ kind: 'sub', min: s.min, ours: false, inName: splitFfcm(s.in).short, outName: splitFfcm(s.out).short }) as const,
@@ -69,7 +70,11 @@ function Header({ m }: { m: Match }) {
             ) : (
               <p className="font-display text-3xl font-extrabold md:text-5xl">{fmtTime(m)}</p>
             )}
-            <p className="mt-2 font-display text-xs font-bold uppercase tracking-[0.2em] text-white/70">{score ? 'Final' : 'Próximo'}</p>
+            {isLive(m) ? (
+              <LiveBadge match={m} className="mt-2" />
+            ) : (
+              <p className="mt-2 font-display text-xs font-bold uppercase tracking-[0.2em] text-white/70">{score ? 'Final' : 'Próximo'}</p>
+            )}
           </div>
           {side(away)}
         </div>
@@ -238,26 +243,6 @@ function Lineups({ m, base }: { m: Match; base: string }) {
   )
 }
 
-function MatchMvp({ m }: { m: Match }) {
-  const team = useTeam()
-  const poll = team.polls.find((p) => p.match_id === m.id && p.status === 'closed')
-  const [winner, setWinner] = useState<Player | null>(null)
-  useEffect(() => {
-    if (!poll) return
-    fetchResults(poll.id).then((r) => setWinner(team.players.find((p) => p.id === r[0]?.player_id) ?? null)).catch(() => {})
-  }, [poll, team])
-  if (!winner) return null
-  return (
-    <Link to={`${team.base}/jugador/${winner.id}`} className="panel flex items-center gap-3 p-3 hover:bg-white/10">
-      <span className="size-12 shrink-0 overflow-hidden rounded-full border-2 border-gold bg-club-800">
-        <PlayerImage player={winner} className="size-full" />
-      </span>
-      <span className="-skew-x-12 bg-gold px-2 py-0.5 font-display text-xs font-extrabold uppercase text-club-950">MVP</span>
-      <span className="font-display text-xl font-extrabold uppercase italic">{winner.firstName} {winner.lastName}</span>
-    </Link>
-  )
-}
-
 export function MatchPage() {
   const { id } = useParams()
   const team = useTeam()
@@ -283,7 +268,7 @@ export function MatchPage() {
     <article className="space-y-8">
       <Link to={`${team.base}/partidos`} className="font-display text-sm font-bold uppercase tracking-wider text-white/60 hover:text-white">← Partidos</Link>
       <Header m={m} />
-      <MatchMvp m={m} />
+      <MvpCard matchId={m.id} />
 
       {!m.score && <p className="panel p-6 text-center text-white/60">Aún no se ha jugado. Aquí aparecerán los goles y la alineación cuando esté el acta.</p>}
       {m.score && !m.lineup && <p className="panel p-6 text-center text-white/60">Todavía no hay acta de este partido.</p>}

@@ -5,6 +5,7 @@ import { Crest } from '../components/Crest'
 import { supabase } from '../lib/supabase'
 import { AdminsAdmin } from './AdminsAdmin'
 import { Login, NewPassword } from './Auth'
+import { LiveAdmin } from './LiveAdmin'
 import { MatchesAdmin } from './MatchesAdmin'
 import { MvpAdmin } from './MvpAdmin'
 import { PlayersAdmin } from './PlayersAdmin'
@@ -14,6 +15,7 @@ import { Button, Notice } from './ui'
 
 type TeamId = 'primer' | 'juvenil'
 const tabs = {
+  directo: 'Directo',
   partidos: 'Partidos',
   jugadores: 'Jugadores',
   clasificacion: 'Clasificación',
@@ -23,7 +25,7 @@ const tabs = {
 } as const
 type Tab = keyof typeof tabs
 // Pestañas que dependen del equipo (las demás son del club)
-const perTeam: Tab[] = ['partidos', 'jugadores', 'clasificacion', 'mvp']
+const perTeam: Tab[] = ['directo', 'partidos', 'jugadores', 'clasificacion', 'mvp']
 
 export default function Admin() {
   const [session, setSession] = useState<Session | null | undefined>(undefined)
@@ -91,6 +93,7 @@ export default function Admin() {
             ))}
           </nav>
           <div className="mt-6" key={team + tab}>
+            {tab === 'directo' && <LiveAdmin team={team} />}
             {tab === 'partidos' && <MatchesAdmin team={team} />}
             {tab === 'jugadores' && <PlayersAdmin team={team} />}
             {tab === 'clasificacion' && <StandingsAdmin team={team} />}

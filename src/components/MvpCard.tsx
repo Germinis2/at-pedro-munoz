@@ -7,7 +7,8 @@ import { PlayerImage } from './PlayerImage'
 
 type Results = { player_id: string; votes: number }[]
 
-export function MvpCard() {
+// Sin `matchId`: la votación de la portada. Con `matchId`: solo la de ese partido (en su página)
+export function MvpCard({ matchId }: { matchId?: number }) {
   const team = useTeam()
   const [poll, setPoll] = useState<MvpPoll | null>(null)
   const [results, setResults] = useState<Results | null>(null)
@@ -20,8 +21,9 @@ export function MvpCard() {
   useEffect(() => {
     let cancelled = false
     const dateOf = (p: MvpPoll) => team.matches.find((m) => m.id === p.match_id)?.date ?? ''
-    const open = team.polls.filter((p) => p.status === 'open')
-    const closed = team.polls.filter((p) => p.status === 'closed').sort((a, b) => dateOf(b).localeCompare(dateOf(a)))
+    const polls = matchId === undefined ? team.polls : team.polls.filter((p) => p.match_id === matchId)
+    const open = polls.filter((p) => p.status === 'open')
+    const closed = polls.filter((p) => p.status === 'closed').sort((a, b) => dateOf(b).localeCompare(dateOf(a)))
     ;(async () => {
       for (const p of [...open, ...closed]) {
         const r = await fetchResults(p.id).catch(() => [])
@@ -38,7 +40,7 @@ export function MvpCard() {
     return () => {
       cancelled = true
     }
-  }, [team])
+  }, [team, matchId])
 
   if (!poll || !match) return null
   const list = candidates(match, team.players)
