@@ -23,8 +23,16 @@ const crests: Record<string, string> = {
   'C.D. Triana Tresjuncos': 'trianaresjuncos',
   'C.D. Villagarcía': 'villagarcia',
   'C.P. Villarrobledo "B"': 'villarrobledo',
-  // Rivales del juvenil que son el mismo club
+  // Rivales del juvenil
   'C.P. Villarrobledo': 'villarrobledo',
+  'C.D. Atlético Tomelloso "B"': 'tomelloso',
+  'C.F. La Solana': 'lasolana',
+  'Sporting de Alcázar C.F. "B"': 'sportingalcazar',
+  'C.D.U. Criptanense': 'criptanense',
+  'C.D.B. Herencia': 'herencia',
+  'Atlético Cervantino': 'atleticocervantino',
+  'Membrilla C.F.': 'membrilla',
+  'E.F.B. Atlético Valdepeñas': 'valdepenasatletico',
 }
 
 export const crestFor = (team: string) => (crests[team] ? `/escudos/${crests[team]}.webp` : undefined)

@@ -47,7 +47,7 @@ export const toMatch = (r: MatchRow): Match => ({
   lineup: r.lineup ?? undefined,
 })
 
-export function buildPlayer(row: PlayerRow, matches: Match[]): Player {
+export function buildPlayer(row: PlayerRow, matches: Match[], mvps = 0): Player {
   const { name, surnames, short } = splitFfcm(row.ffcm)
   const [first, ...rest] = (row.display_name || short).split(' ')
   return {
@@ -64,11 +64,12 @@ export function buildPlayer(row: PlayerRow, matches: Match[]): Player {
     saves: row.saves,
     yellowCards: row.yellow_cards,
     redCards: row.red_cards,
+    mvps,
     ...statsFor(row.ffcm, row.position === 'POR', matches),
   }
 }
 
-export function buildTeam({ team, players, matches, standings }: Seed, polls: MvpPoll[] = []): Team {
+export function buildTeam({ team, players, matches, standings }: Seed, polls: MvpPoll[] = [], mvps: Record<string, number> = {}): Team {
   const ms = matches.map(toMatch)
   return {
     id: team.id,
@@ -79,7 +80,7 @@ export function buildTeam({ team, players, matches, standings }: Seed, polls: Mv
     matches: ms,
     standings: [...standings].sort((a, b) => a.rank - b.rank).map(({ team_id: _t, rank: _r, ...s }) => s as Standing),
     standingsRound: team.standings_round,
-    players: players.map((p) => buildPlayer(p, ms)),
+    players: players.map((p) => buildPlayer(p, ms, mvps[p.id])),
     full: team.full_stats,
     polls: polls.filter((p) => ms.some((m) => m.id === p.match_id)),
   }

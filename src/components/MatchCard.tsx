@@ -29,9 +29,9 @@ export function MatchCard({ match, className = '' }: { match: Match; className?:
       <div className="flex w-24 shrink-0 flex-col items-center gap-1.5">
         <p className="text-[11px] font-semibold tracking-wider text-white/60">{fmtDay(match)}</p>
         {score ? (
-          <p className="text-2xl font-semibold tabular-nums">{score}</p>
+          <p className="bg-club-950/60 px-3 py-0.5 font-display text-3xl font-extrabold tabular-nums">{score}</p>
         ) : (
-          <p className={match.time ? 'text-2xl font-semibold tabular-nums' : 'text-center text-xs font-semibold leading-tight text-white/70'}>
+          <p className={match.time ? 'font-display text-3xl font-extrabold tabular-nums' : 'text-center text-xs font-semibold leading-tight text-white/70'}>
             {fmtTime(match)}
           </p>
         )}
@@ -48,7 +48,7 @@ export function MatchCard({ match, className = '' }: { match: Match; className?:
 export function ResultDot({ r, big = false }: { r: Result; big?: boolean }) {
   const color = r === 'G' ? 'bg-emerald-500' : r === 'E' ? 'bg-amber-400 text-club-950' : 'bg-white/25'
   return big ? (
-    <span className={`grid size-8 place-items-center rounded-full text-xs font-bold ${color}`}>{r === 'G' ? 'V' : r}</span>
+    <span className={`grid size-8 -skew-x-12 place-items-center font-display text-base font-extrabold ${color}`}>{r === 'G' ? 'V' : r}</span>
   ) : (
     <span className={`size-2 rounded-full ${color}`} aria-label={r === 'G' ? 'Victoria' : r === 'E' ? 'Empate' : 'Derrota'} />
   )

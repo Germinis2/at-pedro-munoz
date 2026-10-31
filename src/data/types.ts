@@ -53,6 +53,7 @@ export interface Player {
   saves: number
   yellowCards: number
   redCards: number
+  mvps: number // votaciones del MVP ganadas
 }
 
 // Filas tal cual están en Supabase
@@ -115,7 +116,7 @@ export interface Seed {
   standings: StandingRow[]
 }
 
-export type StatKey = 'appearances' | 'minutes' | 'goals' | 'assists' | 'cleanSheets' | 'saves' | 'yellowCards' | 'redCards'
+export type StatKey = 'appearances' | 'minutes' | 'goals' | 'assists' | 'cleanSheets' | 'saves' | 'yellowCards' | 'redCards' | 'mvps'
 
 export interface Team {
   id: 'primer' | 'juvenil'

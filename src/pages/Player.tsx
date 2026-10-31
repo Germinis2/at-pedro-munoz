@@ -11,7 +11,7 @@ import type { StatKey } from '../data/types'
 function Stat({ value, label }: { value: number | string; label: string }) {
   return (
     <div>
-      <p className="text-4xl font-semibold tabular-nums md:text-5xl">{value}</p>
+      <p className="font-display text-5xl font-extrabold tabular-nums md:text-6xl">{value}</p>
       <p className="mt-1 text-sm font-medium text-club-300">{label}</p>
     </div>
   )
@@ -80,7 +80,7 @@ export function Player() {
         </div>
 
         <div className="mt-3 flex items-center gap-5">
-          <h1 className="text-5xl font-bold leading-[0.95] tracking-tight sm:text-6xl xl:text-7xl">
+          <h1 className="font-display text-6xl font-extrabold uppercase italic leading-[0.85] sm:text-7xl xl:text-8xl">
             {p.firstName}
             <br />
             {p.lastName}

@@ -12,16 +12,18 @@ type Teams = Record<TeamId, Team>
 const local: Teams = { primer: buildTeam(primerSeed), juvenil: buildTeam(juvenilSeed) }
 
 async function fetchTeams(): Promise<Teams> {
-  const [t, p, m, s, v] = await Promise.all([
+  const [t, p, m, s, v, w] = await Promise.all([
     supabase.from('teams').select('*'),
     supabase.from('players').select('*'),
     supabase.from('matches').select('*').order('date'),
     supabase.from('standings').select('*'),
     supabase.from('mvp_polls').select('*').order('opened_at', { ascending: false }),
+    supabase.rpc('mvp_winners'),
   ])
-  const error = t.error ?? p.error ?? m.error ?? s.error ?? v.error
+  const error = t.error ?? p.error ?? m.error ?? s.error ?? v.error ?? w.error
   if (error) throw error
   const polls = v.data as MvpPoll[]
+  const mvps = Object.fromEntries((w.data as { player_id: string; wins: number }[]).map((r) => [r.player_id, Number(r.wins)]))
   const build = (team: TeamRow): Team => {
     const seed: Seed = {
       team,
@@ -29,7 +31,7 @@ async function fetchTeams(): Promise<Teams> {
       matches: (m.data as MatchRow[]).filter((x) => x.team_id === team.id),
       standings: (s.data as StandingRow[]).filter((x) => x.team_id === team.id),
     }
-    return buildTeam(seed, polls)
+    return buildTeam(seed, polls, mvps)
   }
   const rows = t.data as TeamRow[]
   if (rows.length < 2) throw new Error('Base de datos sin cargar')

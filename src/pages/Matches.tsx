@@ -10,16 +10,16 @@ export function Matches() {
     <section className="space-y-10">
       <div>
         <p className="label-caps">{team.label} · Temporada 2026/27</p>
-        <h1 className="text-3xl font-bold md:text-4xl">Partidos</h1>
+        <h1 className="font-display text-5xl font-extrabold uppercase italic leading-none md:text-6xl">Partidos</h1>
       </div>
       <div>
-        <h2 className="label-caps mb-3">Próximos</h2>
+        <h2 className="section-title mb-4">Próximos</h2>
         <div className="grid gap-3 md:grid-cols-2">
           {next.map((m) => <MatchCard key={m.id} match={m} />)}
         </div>
       </div>
       <div>
-        <h2 className="label-caps mb-3">Resultados</h2>
+        <h2 className="section-title mb-4">Resultados</h2>
         {past.length ? (
           <div className="grid gap-3 md:grid-cols-2">{past.map((m) => <MatchCard key={m.id} match={m} />)}</div>
         ) : (

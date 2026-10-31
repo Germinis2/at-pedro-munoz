@@ -7,7 +7,7 @@ export function Table() {
   return (
     <section>
       <p className="label-caps">{team.league} · {team.group}</p>
-      <h1 className="text-3xl font-bold md:text-4xl">Clasificación</h1>
+      <h1 className="font-display text-5xl font-extrabold uppercase italic leading-none md:text-6xl">Clasificación</h1>
       <p className="mt-1 text-sm text-white/50">Tras la jornada {team.standingsRound}</p>
       <div className="panel mt-6 overflow-hidden">
         <table className="w-full text-sm">

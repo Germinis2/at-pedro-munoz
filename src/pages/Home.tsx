@@ -22,9 +22,9 @@ function useCountdown(target?: Date) {
 
 function SectionHead({ title, to, cta = 'Ver todo' }: { title: string; to?: string; cta?: string }) {
   return (
-    <div className="mb-3 flex items-center justify-between">
-      <h2 className="label-caps">{title}</h2>
-      {to && <Link to={to} className="text-xs font-semibold text-white/70 hover:text-white">{cta} →</Link>}
+    <div className="mb-4 flex items-end justify-between">
+      <h2 className="section-title">{title}</h2>
+      {to && <Link to={to} className="font-display text-sm font-bold uppercase tracking-wider text-white/60 hover:text-white">{cta} →</Link>}
     </div>
   )
 }
@@ -32,17 +32,19 @@ function SectionHead({ title, to, cta = 'Ver todo' }: { title: string; to?: stri
 function TeamSwitch() {
   const { teams } = useTeams()
   return (
-    <div className="grid grid-cols-2 rounded-full border border-white/10 bg-club-950/50 p-1 text-sm font-semibold md:inline-grid md:w-80">
+    <div className="grid grid-cols-2 gap-2 md:inline-grid md:w-96">
       {Object.values(teams).map((t) => (
         <NavLink
           key={t.id}
           to={t.base || '/'}
           end
           className={({ isActive }) =>
-            `rounded-full py-2.5 text-center transition-colors ${isActive ? 'bg-white text-club-800 shadow' : 'text-white/60 hover:text-white'}`
+            `-skew-x-12 border py-2.5 text-center font-display text-lg font-extrabold uppercase italic tracking-wide transition-colors ${
+              isActive ? 'border-club-500 bg-club-500 text-white' : 'border-white/15 text-white/55 hover:border-white/30 hover:text-white'
+            }`
           }
         >
-          {t.label}
+          <span className="inline-block skew-x-12">{t.label}</span>
         </NavLink>
       ))}
     </div>
@@ -56,43 +58,62 @@ export function Home() {
   const cd = useCountdown(next?.time ? kickoff(next) : undefined)
   const s = summary(team.standings)
 
-  const tiles = [
-    { label: 'Posición', value: `${s.position}º`, hint: `de ${s.teams}` },
-    { label: 'Puntos', value: s.points, hint: `${s.played} jugados` },
-    { label: 'A favor', value: s.goalsFor, hint: 'goles' },
-    { label: 'En contra', value: s.goalsAgainst, hint: 'goles' },
+  const diff = s.goalsFor - s.goalsAgainst
+  const board = [
+    { label: 'Puntos', value: s.points },
+    { label: 'Jugados', value: s.played },
+    { label: 'Goles', value: `${s.goalsFor}-${s.goalsAgainst}` },
+    { label: 'Dif.', value: `${diff > 0 ? '+' : ''}${diff}` },
   ]
 
   return (
     <div className="space-y-10 md:space-y-14">
       <TeamSwitch />
 
-      {/* Hero */}
-      <section className="relative -mt-4 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-club-600 via-club-800 to-club-950 p-5 md:-mt-6 md:p-10">
-        <img src={club.crest} alt="" aria-hidden className="pointer-events-none absolute -right-16 -top-10 w-72 opacity-[0.07] md:-right-10 md:w-[420px]" />
-        <div className="relative md:flex md:items-end md:justify-between md:gap-10">
-          <div className="flex items-center gap-4 md:gap-6">
-            <Crest className="size-20 shrink-0 drop-shadow-xl md:size-36" />
-            <div>
-              <p className="label-caps text-club-100/80">{team.league} · {team.group}</p>
-              <h1 className="text-3xl font-bold leading-tight md:text-5xl">{club.shortName}</h1>
-              <p className="text-sm text-white/70">{team.full ? club.region : team.label} · Temporada {club.season}</p>
+      {/* Cabecera: bloque diagonal con el escudo y marcador de la temporada */}
+      <section className="clip-corner relative -mt-4 overflow-hidden bg-club-600 md:-mt-6">
+        {/* Franjas diagonales y posición gigante de fondo */}
+        <div className="absolute inset-0 bg-[repeating-linear-gradient(115deg,transparent_0_46px,rgb(0_0_0/0.12)_46px_92px)]" aria-hidden />
+        <div className="absolute inset-y-0 right-0 w-1/2 bg-club-800 [clip-path:polygon(28%_0,100%_0,100%_100%,0_100%)]" aria-hidden />
+        <span
+          className="pointer-events-none absolute -bottom-8 right-3 font-display text-[11rem] font-extrabold italic leading-none text-transparent [-webkit-text-stroke:2px_rgb(255_255_255/0.14)] md:-bottom-12 md:text-[17rem]"
+          aria-hidden
+        >
+          {s.position}º
+        </span>
+
+        <div className="relative p-5 md:p-10">
+          <div className="flex items-center gap-4 md:gap-7">
+            <Crest className="size-20 shrink-0 drop-shadow-[0_6px_16px_rgb(0_0_0/0.45)] md:size-36" />
+            <div className="min-w-0">
+              <p className="font-display text-sm font-bold uppercase tracking-[0.2em] text-club-100/80">{team.league} · {team.group}</p>
+              <h1 className="font-display text-4xl font-extrabold uppercase italic leading-[0.9] md:text-7xl">{club.shortName}</h1>
+              <p className="mt-1 text-sm text-white/75">{team.full ? club.region : team.label} · Temporada {club.season}</p>
             </div>
           </div>
-          <div className="mt-6 grid grid-cols-4 gap-2 md:mt-0 md:w-[440px] md:gap-3">
-            {tiles.map((t, i) => (
-              <div key={t.label} className={`rounded-2xl px-1 py-3 text-center md:p-4 ${i === 0 ? 'bg-white text-club-800' : 'bg-white/10'}`}>
-                <p className="text-2xl font-bold md:text-4xl">{t.value}</p>
-                <p className={`mt-0.5 whitespace-nowrap text-[9px] font-semibold uppercase tracking-wide md:text-[10px] md:tracking-wider ${i === 0 ? 'text-club-600' : 'text-white/60'}`}>{t.label}</p>
-                <p className={`text-[10px] ${i === 0 ? 'text-club-700/70' : 'text-white/40'}`}>{t.hint}</p>
-              </div>
-            ))}
+
+          <div className="mt-6 flex flex-wrap items-stretch gap-3 md:mt-10">
+            <div className="flex -skew-x-12 items-center gap-2 bg-white px-4 py-2 text-club-800">
+              <span className="skew-x-12 font-display text-4xl font-extrabold italic leading-none md:text-5xl">{s.position}º</span>
+              <span className="skew-x-12 font-display text-xs font-bold uppercase leading-tight tracking-wider">
+                de {s.teams}
+                <br />
+                equipos
+              </span>
+            </div>
+            <dl className="flex flex-1 divide-x divide-white/15 bg-club-950/45 backdrop-blur-sm">
+              {board.map((b) => (
+                <div key={b.label} className="flex-1 px-2 py-2 text-center md:px-4">
+                  <dd className="font-display text-2xl font-extrabold tabular-nums md:text-4xl">{b.value}</dd>
+                  <dt className="font-display text-[11px] font-bold uppercase tracking-widest text-white/60">{b.label}</dt>
+                </div>
+              ))}
+            </dl>
           </div>
+          <p className="mt-3 font-display text-sm font-bold uppercase tracking-widest text-white/70">
+            {s.won}V · {s.drawn}E · {s.lost}D
+          </p>
         </div>
-        <p className="relative mt-4 text-center text-xs text-white/70 md:text-right">
-          <b className="text-white">{s.won}</b> victorias · <b className="text-white">{s.drawn}</b> empates · <b className="text-white">{s.lost}</b> derrotas · diferencia{' '}
-          <b className="text-white">{s.goalsFor - s.goalsAgainst > 0 ? '+' : ''}{s.goalsFor - s.goalsAgainst}</b>
-        </p>
       </section>
 
       <MvpCard />
@@ -104,8 +125,8 @@ export function Home() {
             <SectionHead title="Próximo partido" to={`${team.base}/partidos`} cta="Calendario" />
             <div className="panel p-5">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">Jornada {next.round}</span>
-                <span className="rounded-full bg-club-500 px-3 py-1 text-xs font-semibold">{next.home ? 'En casa' : 'Fuera'}</span>
+                <span className="-skew-x-12 bg-white/10 px-3 py-1 font-display text-sm font-bold uppercase tracking-wider">Jornada {next.round}</span>
+                <span className="-skew-x-12 bg-club-500 px-3 py-1 font-display text-sm font-bold uppercase tracking-wider">{next.home ? 'En casa' : 'Fuera'}</span>
               </div>
               <MatchCard match={next} className="mt-4 border-none bg-transparent p-0" />
               {cd && (
@@ -156,7 +177,7 @@ export function Home() {
 
       <section className="grid gap-4 sm:grid-cols-2">
         <Leaderboard title="Goleadores" stat="goals" limit={5} />
-        <Leaderboard title="Más minutos" stat="minutes" limit={5} />
+        <Leaderboard title="MVPs" stat="mvps" limit={5} />
       </section>
 
       {/* Plantilla */}

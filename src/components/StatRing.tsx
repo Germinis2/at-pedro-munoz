@@ -12,7 +12,7 @@ export function StatRing({ value, max, label }: { value: number; max: number; la
             strokeDasharray={c} strokeDashoffset={c * (1 - pct)} className="transition-[stroke-dashoffset] duration-700"
           />
         </svg>
-        <span className="absolute inset-0 grid place-items-center text-3xl font-semibold md:text-4xl">{value}</span>
+        <span className="absolute inset-0 grid place-items-center font-display text-4xl font-extrabold md:text-5xl">{value}</span>
       </div>
       <figcaption className="text-center text-sm font-semibold">{label}</figcaption>
     </figure>

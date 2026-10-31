@@ -29,7 +29,7 @@ export function Leaderboard({ title, stat, limit = 5, compact = false }: { title
                   <span className="block truncate text-sm font-semibold">{p.firstName} {p.lastName}</span>
                   {!compact && <span className="text-[11px] text-white/50">{positionLabel(p.position)}</span>}
                 </span>
-                <span className="text-lg font-bold tabular-nums">
+                <span className="font-display text-2xl font-extrabold tabular-nums">
                   {p[stat]}
                   {stat === 'minutes' && <span className="ml-0.5 text-xs font-medium text-white/50">'</span>}
                 </span>
@@ -47,10 +47,11 @@ export function Stats() {
   return (
     <section>
       <p className="label-caps">{team.label} · Temporada 2026/27</p>
-      <h1 className="text-3xl font-bold md:text-4xl">Estadísticas</h1>
+      <h1 className="font-display text-5xl font-extrabold uppercase italic leading-none md:text-6xl">Estadísticas</h1>
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Leaderboard title="Goleadores" stat="goals" limit={10} />
         {team.full && <Leaderboard title="Asistencias" stat="assists" limit={10} />}
+        <Leaderboard title="MVPs" stat="mvps" limit={10} />
         <Leaderboard title="Más minutos" stat="minutes" limit={10} />
         {team.full && (
           <>

@@ -42,7 +42,7 @@ export function Squad() {
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="label-caps">{team.label} · Temporada 2026/27</p>
-          <h1 className="text-3xl font-bold md:text-4xl">Plantilla</h1>
+          <h1 className="font-display text-5xl font-extrabold uppercase italic leading-none md:text-6xl">Plantilla</h1>
         </div>
         <p className="text-sm text-white/50">{list.length} jugadores</p>
       </div>
@@ -55,7 +55,7 @@ export function Squad() {
               setFilter(f)
               setActive(0)
             }}
-            className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-colors ${
+            className={`shrink-0 -skew-x-12 px-4 py-2 font-display text-sm font-bold uppercase tracking-wider transition-colors ${
               filter === f ? 'bg-white text-club-800' : 'bg-white/10 text-white/70 hover:bg-white/15'
             }`}
           >
@@ -120,13 +120,13 @@ export function Squad() {
             {current.firstName}
             {current.nickname && <span className="text-club-300"> “{current.nickname}”</span>}
           </p>
-          <h2 className="text-5xl font-bold leading-none tracking-tight md:text-7xl">{current.lastName}</h2>
+          <h2 className="font-display text-6xl font-extrabold uppercase italic leading-none md:text-8xl">{current.lastName}</h2>
           <p className="label-caps mt-3">{positionLabel(current.position)}{current.number && ` · Dorsal ${current.number}`}</p>
           <div className="mt-5 flex items-center justify-center gap-3">
             <button onClick={() => go(-1)} disabled={active === 0} className="grid size-11 place-items-center rounded-full bg-white/10 transition hover:bg-white/20 disabled:opacity-30" aria-label="Anterior">
               <ChevronLeft className="size-5" />
             </button>
-            <Link to={`${team.base}/jugador/${current.id}`} className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-club-800 transition hover:bg-club-100">
+            <Link to={`${team.base}/jugador/${current.id}`} className="-skew-x-12 bg-white px-6 py-3 font-display text-base font-extrabold uppercase italic tracking-wide text-club-800 transition hover:bg-club-100">
               Ver ficha
             </Link>
             <button onClick={() => go(1)} disabled={active === list.length - 1} className="grid size-11 place-items-center rounded-full bg-white/10 transition hover:bg-white/20 disabled:opacity-30" aria-label="Siguiente">

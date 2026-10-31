@@ -1,57 +1,33 @@
 import type { Session } from '@supabase/supabase-js'
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Crest } from '../components/Crest'
 import { supabase } from '../lib/supabase'
+import { AdminsAdmin } from './AdminsAdmin'
+import { Login, NewPassword } from './Auth'
 import { MatchesAdmin } from './MatchesAdmin'
 import { MvpAdmin } from './MvpAdmin'
 import { PlayersAdmin } from './PlayersAdmin'
 import { StandingsAdmin } from './StandingsAdmin'
-import { Button, Field, Input, Notice } from './ui'
+import { Button, Notice } from './ui'
 
 type TeamId = 'primer' | 'juvenil'
-const tabs = { partidos: 'Partidos', jugadores: 'Jugadores', clasificacion: 'Clasificación', mvp: 'MVP' } as const
+const tabs = { partidos: 'Partidos', jugadores: 'Jugadores', clasificacion: 'Clasificación', mvp: 'MVP', admins: 'Administradores' } as const
 type Tab = keyof typeof tabs
-
-function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
-  const submit = async (e: FormEvent) => {
-    e.preventDefault()
-    setBusy(true)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    setBusy(false)
-    if (error) setError('Email o contraseña incorrectos')
-  }
-  return (
-    <form onSubmit={submit} className="panel mx-auto mt-16 max-w-sm space-y-4 p-6">
-      <div className="flex items-center gap-3">
-        <Crest className="size-12" />
-        <h1 className="text-xl font-bold">Panel del club</h1>
-      </div>
-      <Field label="Email">
-        <Input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
-      </Field>
-      <Field label="Contraseña">
-        <Input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-      </Field>
-      {error && <Notice kind="error">{error}</Notice>}
-      <Button type="submit" disabled={busy} className="w-full">Entrar</Button>
-    </form>
-  )
-}
 
 export default function Admin() {
   const [session, setSession] = useState<Session | null | undefined>(undefined)
+  const [recovering, setRecovering] = useState(false)
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
   const [team, setTeam] = useState<TeamId>('primer')
   const [tab, setTab] = useState<Tab>('partidos')
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session))
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSession(s))
+    const { data } = supabase.auth.onAuthStateChange((event, s) => {
+      setSession(s)
+      if (event === 'PASSWORD_RECOVERY') setRecovering(true)
+    })
     return () => data.subscription.unsubscribe()
   }, [])
 
@@ -62,6 +38,7 @@ export default function Admin() {
 
   if (session === undefined) return null
   if (!session) return <div className="px-4"><Login /></div>
+  if (recovering) return <div className="px-4"><NewPassword onDone={() => setRecovering(false)} /></div>
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 md:px-8">
@@ -108,6 +85,7 @@ export default function Admin() {
             {tab === 'jugadores' && <PlayersAdmin team={team} />}
             {tab === 'clasificacion' && <StandingsAdmin team={team} />}
             {tab === 'mvp' && <MvpAdmin team={team} />}
+            {tab === 'admins' && <AdminsAdmin me={session.user.email ?? ''} />}
           </div>
         </>
       ) : null}

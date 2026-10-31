@@ -62,9 +62,9 @@ export function MvpCard() {
   }
 
   const head = (
-    <div className="mb-3 flex items-center justify-between">
-      <h2 className="label-caps">{open ? 'Vota al MVP' : 'MVP del último partido'}</h2>
-      <span className="text-xs font-semibold text-white/50">Jornada {match.round} · {match.opponent}</span>
+    <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+      <h2 className="section-title">{open ? 'Vota al MVP' : 'MVP de la jornada'}</h2>
+      <span className="font-display text-sm font-bold uppercase tracking-wider text-white/50">Jornada {match.round} · {match.opponent}</span>
     </div>
   )
 
@@ -76,12 +76,12 @@ export function MvpCard() {
       <section>
         {head}
         <Link to={`${team.base}/jugador/${winner.id}`} className="panel flex items-center gap-4 overflow-hidden bg-gradient-to-r from-club-600/60 to-club-900/40 p-4">
-          <span className="size-20 shrink-0 overflow-hidden rounded-full border-2 border-amber-300 bg-club-800">
+          <span className="size-20 shrink-0 overflow-hidden rounded-full border-2 border-gold bg-club-800">
             <PlayerImage player={winner} className="size-full" />
           </span>
           <div>
-            <span className="rounded-full bg-amber-300 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-club-950">MVP · Jornada {match.round}</span>
-            <p className="mt-1.5 text-2xl font-bold leading-tight">{winner.firstName} {winner.lastName}</p>
+            <span className="inline-block -skew-x-12 bg-gold px-2.5 py-0.5 font-display text-xs font-extrabold uppercase tracking-wider text-club-950">MVP · Jornada {match.round}</span>
+            <p className="mt-1.5 font-display text-3xl font-extrabold uppercase italic leading-none">{winner.firstName} {winner.lastName}</p>
             <p className="text-sm text-white/60">{pct(winner.id)}% de {total} {total === 1 ? 'voto' : 'votos'}</p>
           </div>
         </Link>
@@ -101,7 +101,7 @@ export function MvpCard() {
                 disabled={busy || showResults}
                 onClick={() => submit(p.id)}
                 className={`relative flex w-full items-center gap-3 overflow-hidden rounded-xl border p-2 text-left transition ${
-                  voted === p.id ? 'border-amber-300 bg-amber-300/10' : 'border-white/10 bg-white/5 enabled:hover:bg-white/10'
+                  voted === p.id ? 'border-gold bg-gold/10' : 'border-white/10 bg-white/5 enabled:hover:bg-white/10'
                 }`}
               >
                 {showResults && <span className="absolute inset-y-0 left-0 bg-white/10" style={{ width: `${pct(p.id)}%` }} aria-hidden />}
