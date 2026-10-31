@@ -8,12 +8,22 @@ import { Login, NewPassword } from './Auth'
 import { MatchesAdmin } from './MatchesAdmin'
 import { MvpAdmin } from './MvpAdmin'
 import { PlayersAdmin } from './PlayersAdmin'
+import { SponsorsAdmin } from './SponsorsAdmin'
 import { StandingsAdmin } from './StandingsAdmin'
 import { Button, Notice } from './ui'
 
 type TeamId = 'primer' | 'juvenil'
-const tabs = { partidos: 'Partidos', jugadores: 'Jugadores', clasificacion: 'Clasificación', mvp: 'MVP', admins: 'Administradores' } as const
+const tabs = {
+  partidos: 'Partidos',
+  jugadores: 'Jugadores',
+  clasificacion: 'Clasificación',
+  mvp: 'MVP',
+  patrocinadores: 'Patrocinadores',
+  admins: 'Administradores',
+} as const
 type Tab = keyof typeof tabs
+// Pestañas que dependen del equipo (las demás son del club)
+const perTeam: Tab[] = ['partidos', 'jugadores', 'clasificacion', 'mvp']
 
 export default function Admin() {
   const [session, setSession] = useState<Session | null | undefined>(undefined)
@@ -58,7 +68,7 @@ export default function Admin() {
         </div>
       ) : isAdmin ? (
         <>
-          <div className="mt-6 flex flex-wrap gap-2">
+          <div className={`mt-6 flex flex-wrap gap-2 ${perTeam.includes(tab) ? '' : 'invisible'}`}>
             {(['primer', 'juvenil'] as const).map((t) => (
               <button
                 key={t}
@@ -85,6 +95,7 @@ export default function Admin() {
             {tab === 'jugadores' && <PlayersAdmin team={team} />}
             {tab === 'clasificacion' && <StandingsAdmin team={team} />}
             {tab === 'mvp' && <MvpAdmin team={team} />}
+            {tab === 'patrocinadores' && <SponsorsAdmin />}
             {tab === 'admins' && <AdminsAdmin me={session.user.email ?? ''} />}
           </div>
         </>
