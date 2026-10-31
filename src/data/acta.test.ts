@@ -20,6 +20,14 @@ describe('parseActa', () => {
       { min: 83, player: 'SANCHEZ ALBERCA, JAIME' },
     ])
     expect(p.score).toEqual({ us: 3, them: 0 })
+    // Rival detrás de nosotros en el acta
+    expect(p.lineup.rival?.starters).toHaveLength(11)
+    expect(p.lineup.rival?.starters[0]).toEqual([1, 'VIDALES HUELAMO, FELIPE'])
+    expect(p.lineup.rival?.bench).toHaveLength(4)
+    expect(p.lineup.rival?.subs).toEqual([
+      { min: 61, in: 'SANABRIA BELLO, IVAN', out: 'ESCAMILLA PEÑA, PEDRO' },
+      { min: 70, in: 'FERNANDEZ PINEDO, LUIS MIGUEL', out: 'DE FRUTOS SÁNCHEZ, JORGE' },
+    ])
   })
 
   it('lee un partido fuera y solo toma nuestra alineación', () => {
@@ -32,6 +40,12 @@ describe('parseActa', () => {
     expect(p.lineup.goals).toEqual([{ min: 4, player: 'PULPON BUENDIA, REYES' }])
     // Limitación conocida: el gol en propia puerta del rival se cuenta como suyo (real: 2-2)
     expect(p.score).toEqual({ us: 1, them: 3 })
+    // Rival delante de nosotros en el acta: su bloque no debe incluir el nuestro
+    expect(p.lineup.rival?.starters).toHaveLength(11)
+    expect(p.lineup.rival?.bench).toHaveLength(5)
+    expect(p.lineup.rival?.subs).toHaveLength(4)
+    expect(p.lineup.rival?.subs.at(-1)).toEqual({ min: 85, in: 'SANCHEZ PARRA, ANIBAL', out: 'VALDOVINOS ESPINOLA, JONAS ELIEZER' })
+    expect(p.lineup.rivalGoals?.map((g) => g.min)).toEqual([54, 55, 73])
   })
 
   it('lee el juvenil con nombres con tilde y guion', () => {
@@ -48,6 +62,7 @@ describe('parseActa', () => {
     ])
     expect(p.score).toEqual({ us: 5, them: 1 })
     expect(p.lineup.rivalGoals).toEqual([{ min: 24, player: 'SANCHEZ CARABAÑO, ALEJANDRO' }])
+    expect(p.lineup.rival?.subs).toHaveLength(5)
   })
 
   it('avisa si el texto no es un acta nuestra', () => {

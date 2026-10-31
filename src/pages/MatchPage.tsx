@@ -13,7 +13,7 @@ import type { Match, Player } from '../data/types'
 
 type Event =
   | { kind: 'goal'; min: number; ours: boolean; who: string; id?: string; ownGoal?: boolean }
-  | { kind: 'sub'; min: number; inName: string; outName: string }
+  | { kind: 'sub'; min: number; ours: boolean; inName: string; outName: string }
 
 function useNames(players: Player[]) {
   return (raw: string) => {
@@ -31,7 +31,10 @@ function buildEvents(m: Match, name: ReturnType<typeof useNames>): Event[] {
         : ({ kind: 'goal', min: g.min, ours: true, who: 'Gol en propia puerta', ownGoal: true } as const),
     ),
     ...(l.rivalGoals ?? []).map((g) => ({ kind: 'goal', min: g.min, ours: false, who: splitFfcm(g.player).short }) as const),
-    ...l.subs.map((s) => ({ kind: 'sub', min: s.min, inName: name(s.in).name, outName: name(s.out).name }) as const),
+    ...l.subs.map((s) => ({ kind: 'sub', min: s.min, ours: true, inName: name(s.in).name, outName: name(s.out).name }) as const),
+    ...(l.rival?.subs ?? []).map(
+      (s) => ({ kind: 'sub', min: s.min, ours: false, inName: splitFfcm(s.in).short, outName: splitFfcm(s.out).short }) as const,
+    ),
   ]
   // Los de minuto desconocido (0) van al final
   return events.sort((a, b) => (a.min || 999) - (b.min || 999))
@@ -92,7 +95,8 @@ function Timeline({ m, events, base, running: showRunning }: { m: Match; events:
   return (
     <ol className="relative space-y-2 before:absolute before:inset-y-0 before:left-1/2 before:w-px before:-translate-x-1/2 before:bg-white/15">
       {events.map((e, i) => {
-        const left = e.kind === 'sub' ? ourSide === 'left' : (e.ours ? ourSide : ourSide === 'left' ? 'right' : 'left') === 'left'
+        // Lo nuestro en nuestro lado (izquierda si somos locales); lo del rival, en el otro
+        const left = e.ours === (ourSide === 'left')
         let body
         if (e.kind === 'goal') {
           if (e.ours) us++
@@ -133,22 +137,30 @@ function Timeline({ m, events, base, running: showRunning }: { m: Match; events:
   )
 }
 
-function Lineup({ m, base }: { m: Match; base: string }) {
+type Side = {
+  label: string
+  ours: boolean
+  starters: [number, string][]
+  bench: [number, string][]
+  subs: { min: number; in: string; out: string }[]
+  scorers: string[]
+}
+
+// Titulares y suplentes de un equipo; los nuestros con foto y enlace a su ficha
+function TeamLineup({ side, base }: { side: Side; base: string }) {
   const team = useTeam()
   const name = useNames(team.players)
-  const l = m.lineup!
-  const goalsOf = (raw: string) => l.goals.filter((g) => g.player === raw).length
   const row = ([n, raw]: [number, string], bench: boolean) => {
-    const { name: label, player } = name(raw)
-    const out = l.subs.find((s) => s.out === raw)
-    const inn = l.subs.find((s) => s.in === raw)
-    const goals = goalsOf(raw)
+    const { name: label, player } = side.ours ? name(raw) : { name: splitFfcm(raw).short, player: undefined }
+    const out = side.subs.find((s) => s.out === raw)
+    const inn = side.subs.find((s) => s.in === raw)
+    const goals = side.scorers.filter((s) => s === raw).length
     const content = (
       <>
         <span className="grid size-8 shrink-0 place-items-center overflow-hidden rounded-full bg-club-800">
           {player ? <PlayerImage player={player} className="size-full" /> : <span className="font-display text-sm font-bold">{n}</span>}
         </span>
-        <span className="w-6 text-right font-display text-sm font-bold text-white/40">{n}</span>
+        {player && <span className="w-6 text-right font-display text-sm font-bold text-white/40">{n}</span>}
         <span className={`min-w-0 flex-1 truncate text-sm font-semibold ${bench && !inn ? 'text-white/45' : ''}`}>{label}</span>
         {Array.from({ length: goals }, (_, k) => <BallIcon key={k} className="size-4" />)}
         {out && <span className="font-display text-xs font-bold text-red-400">▼ {out.min}'</span>}
@@ -166,16 +178,63 @@ function Lineup({ m, base }: { m: Match; base: string }) {
     )
   }
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="space-y-4">
       <div>
         <h3 className="label-caps mb-2">Titulares</h3>
-        <ul className="panel divide-y divide-white/5 p-1">{l.starters.map((p) => row(p, false))}</ul>
+        <ul className="panel divide-y divide-white/5 p-1">{side.starters.map((p) => row(p, false))}</ul>
       </div>
-      <div>
-        <h3 className="label-caps mb-2">Suplentes</h3>
-        <ul className="panel divide-y divide-white/5 p-1">{l.bench.map((p) => row(p, true))}</ul>
-      </div>
+      {side.bench.length > 0 && (
+        <div>
+          <h3 className="label-caps mb-2">Suplentes</h3>
+          <ul className="panel divide-y divide-white/5 p-1">{side.bench.map((p) => row(p, true))}</ul>
+        </div>
+      )}
     </div>
+  )
+}
+
+// Los dos equipos: lado a lado en escritorio y con pestañas en el móvil (local primero)
+function Lineups({ m, base }: { m: Match; base: string }) {
+  const l = m.lineup!
+  const us: Side = { label: club.shortName, ours: true, starters: l.starters, bench: l.bench, subs: l.subs, scorers: l.goals.flatMap((g) => (g.player ? [g.player] : [])) }
+  const them: Side | null = l.rival
+    ? { label: m.opponent, ours: false, ...l.rival, scorers: (l.rivalGoals ?? []).map((g) => g.player) }
+    : null
+  const sides = them ? (m.home ? [us, them] : [them, us]) : [us]
+  const [active, setActive] = useState(sides.indexOf(us))
+
+  return (
+    <>
+      {sides.length > 1 && (
+        <div className="mb-4 grid grid-cols-2 gap-2 md:hidden">
+          {sides.map((s, i) => (
+            <button
+              key={s.label}
+              onClick={() => setActive(i)}
+              className={`-skew-x-12 border py-2 font-display text-sm font-extrabold uppercase italic ${
+                active === i ? 'border-club-500 bg-club-500' : 'border-white/15 text-white/55'
+              }`}
+            >
+              <span className="flex skew-x-12 items-center justify-center gap-2 px-2">
+                <Crest club={s.ours} team={s.label} className="size-5 shrink-0" />
+                <span className="truncate">{s.label}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+      <div className={`grid gap-6 ${sides.length > 1 ? 'md:grid-cols-2' : ''}`}>
+        {sides.map((s, i) => (
+          <div key={s.label} className={i === active ? '' : 'hidden md:block'}>
+            <p className="mb-3 hidden items-center gap-2 font-display text-lg font-extrabold uppercase italic md:flex">
+              <Crest club={s.ours} team={s.label} className="size-7" />
+              {s.label}
+            </p>
+            <TeamLineup side={s} base={base} />
+          </div>
+        ))}
+      </div>
+    </>
   )
 }
 
@@ -241,8 +300,8 @@ export function MatchPage() {
 
       {m.lineup && m.score && (
         <section>
-          <h2 className="section-title mb-4">Alineación</h2>
-          <Lineup m={m} base={team.base} />
+          <h2 className="section-title mb-4">Alineaciones</h2>
+          <Lineups m={m} base={team.base} />
         </section>
       )}
     </article>

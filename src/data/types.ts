@@ -7,6 +7,7 @@ export interface Lineup {
   subs: { min: number; in: string; out: string }[]
   goals: { min: number; player: string | null }[] // null = gol en propia puerta del rival
   rivalGoals?: { min: number; player: string }[] // goleadores del rival (solo para la crónica del partido)
+  rival?: { starters: [number, string][]; bench: [number, string][]; subs: { min: number; in: string; out: string }[] }
 }
 
 export interface Match {
