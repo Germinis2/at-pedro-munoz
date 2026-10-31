@@ -80,7 +80,7 @@ function Header({ m }: { m: Match }) {
         </div>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-white/75">
           {m.venue && <span>🏟 {m.venue}</span>}
-          {m.acta && m.score && (
+          {m.acta && m.score && !isLive(m) && (
             <a href={actaUrl(m.acta)} target="_blank" rel="noopener noreferrer" className="font-semibold underline decoration-white/30 underline-offset-4 hover:decoration-white">
               Acta oficial FFCM ↗
             </a>

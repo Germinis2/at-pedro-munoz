@@ -50,6 +50,8 @@ export function LiveAdmin({ team }: { team: 'primer' | 'juvenil' }) {
 
   const save = async (patch: Partial<MatchRow>) => {
     if (!row) return
+    // Se aplica al momento en pantalla (toques rápidos seguidos no se pisan) y luego se guarda
+    setMatches((ms) => ms.map((x) => (x.id === row.id ? { ...x, ...patch } : x)))
     const { data, error } = await supabase.from('matches').update(patch).eq('id', row.id).select().single()
     if (error) return setError(error.message)
     setError('')
