@@ -57,6 +57,7 @@ export function parseActa(raw: string): ParsedActa {
     player: full(m[2].replace(/[\s-]+$/, '').trim()), // quita el guion del marcador que va detrás
   }))
   const goals = allGoals.filter((g) => g.player && names.has(g.player))
+  const rivalGoals = allGoals.filter((g) => g.player && !names.has(g.player))
   const venue = text.match(/Estadio: (.*?) Ciudad/)?.[1]?.trim() || null
 
   return {
@@ -67,6 +68,6 @@ export function parseActa(raw: string): ParsedActa {
     venue,
     // El marcador de la FFCM está oculto: se deduce de los goleadores y hay que revisarlo
     score: { us: goals.length, them: allGoals.length - goals.length },
-    lineup: { starters, bench, subs, goals },
+    lineup: { starters, bench, subs, goals, rivalGoals },
   }
 }

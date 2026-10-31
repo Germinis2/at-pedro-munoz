@@ -1,5 +1,7 @@
+import { Link } from 'react-router-dom'
 import { kickoff } from '../data/build'
 import { club } from '../data/club'
+import { useTeam } from '../data/teams'
 import type { Match, Result } from '../data/types'
 import { Crest } from './Crest'
 
@@ -19,12 +21,17 @@ function Team({ name, ours }: { name: string; ours: boolean }) {
 }
 
 export function MatchCard({ match, className = '' }: { match: Match; className?: string }) {
+  const { base } = useTeam()
   const us = <Team name={club.shortName} ours />
   const them = <Team name={match.opponent} ours={false} />
   const score = match.score && (match.home ? `${match.score.us} - ${match.score.them}` : `${match.score.them} - ${match.score.us}`)
   const result = match.score && (match.score.us > match.score.them ? 'G' : match.score.us === match.score.them ? 'E' : 'P')
   return (
-    <article className={`panel flex items-center gap-2 px-3 py-5 ${className}`}>
+    <Link
+      to={`${base}/partido/${match.id}`}
+      aria-label={`Jornada ${match.round}: ${match.home ? club.shortName : match.opponent} contra ${match.home ? match.opponent : club.shortName}`}
+      className={`panel flex items-center gap-2 px-3 py-5 transition hover:border-white/25 hover:bg-white/[0.07] ${className}`}
+    >
       {match.home ? us : them}
       <div className="flex w-24 shrink-0 flex-col items-center gap-1.5">
         <p className="text-[11px] font-semibold tracking-wider text-white/60">{fmtDay(match)}</p>
@@ -41,7 +48,7 @@ export function MatchCard({ match, className = '' }: { match: Match; className?:
         </p>
       </div>
       {match.home ? them : us}
-    </article>
+    </Link>
   )
 }
 

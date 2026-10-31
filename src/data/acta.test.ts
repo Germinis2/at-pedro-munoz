@@ -47,6 +47,7 @@ describe('parseActa', () => {
       'TENAJAS MANZANERO, ADRIAN',
     ])
     expect(p.score).toEqual({ us: 5, them: 1 })
+    expect(p.lineup.rivalGoals).toEqual([{ min: 24, player: 'SANCHEZ CARABAÑO, ALEJANDRO' }])
   })
 
   it('avisa si el texto no es un acta nuestra', () => {

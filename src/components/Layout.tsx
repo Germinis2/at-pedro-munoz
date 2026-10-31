@@ -66,8 +66,7 @@ export function Layout() {
 
       {/* En el móvil deja hueco abajo para la barra flotante */}
       <footer className="border-t border-white/10 bg-club-950/70 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] pt-8 md:pb-8">
-        <Sponsors />
-        <div className="mx-auto mt-8 flex max-w-7xl flex-col items-center gap-5 border-t border-white/10 px-4 pt-8 text-center md:flex-row md:justify-between md:px-8 md:text-left">
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-5 px-4 text-center md:flex-row md:justify-between md:px-8 md:text-left">
           <div className="flex flex-col items-center gap-3 md:flex-row">
             <Crest className="size-12" />
             <div>
@@ -101,6 +100,8 @@ export function Layout() {
             </div>
           </div>
         </div>
+        {/* Patrocinadores: lo último de la página */}
+        <Sponsors />
       </footer>
 
       {/* Barra flotante en el móvil */}

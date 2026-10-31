@@ -88,6 +88,20 @@ function LineupEditor({ lineup, players, onChange }: { lineup: Lineup; players: 
           <Button variant="ghost" type="button" onClick={() => set('goals', [...lineup.goals, { min: 0, player: firstPlayer }])}>+ Añadir gol</Button>
         </div>
       </div>
+      <div className="md:col-span-2">
+        <h4 className="label-caps mb-2">Goles del rival</h4>
+        <div className="space-y-2">
+          {(lineup.rivalGoals ?? []).map((g, i) => (
+            <div key={i} className="flex gap-2">
+              <Input type="number" placeholder="min" className="!w-16" value={g.min} onChange={(e) => set('rivalGoals', (lineup.rivalGoals ?? []).map((x, j) => (j === i ? { ...x, min: Number(e.target.value) } : x)))} />
+              <Input placeholder="APELLIDOS, NOMBRE" value={g.player} onChange={(e) => set('rivalGoals', (lineup.rivalGoals ?? []).map((x, j) => (j === i ? { ...x, player: e.target.value.toUpperCase() } : x)))} />
+              <Button variant="ghost" type="button" onClick={() => set('rivalGoals', (lineup.rivalGoals ?? []).filter((_, j) => j !== i))} aria-label="Quitar">✕</Button>
+            </div>
+          ))}
+          <p className="text-[11px] text-white/40">Solo se usan en la crónica del partido. Al leer el acta se rellenan solos.</p>
+          <Button variant="ghost" type="button" onClick={() => set('rivalGoals', [...(lineup.rivalGoals ?? []), { min: 0, player: '' }])}>+ Añadir gol del rival</Button>
+        </div>
+      </div>
     </div>
   )
 }

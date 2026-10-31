@@ -15,7 +15,7 @@ export function Sponsors() {
   const main = sponsors.filter((s) => s.tier === 'principal')
   const rest = sponsors.filter((s) => s.tier !== 'principal')
   return (
-    <section aria-label="Patrocinadores" className="mx-auto max-w-7xl px-4 md:px-8">
+    <section aria-label="Patrocinadores" className="mx-auto mt-8 max-w-7xl border-t border-white/10 px-4 pt-8 md:px-8">
       <h2 className="section-title mb-4 text-lg">Patrocinadores</h2>
       {main.length > 0 && (
         <ul className="mb-2 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">

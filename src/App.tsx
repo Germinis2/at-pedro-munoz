@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { TeamProvider, TeamsProvider } from './data/teams'
 import { Home } from './pages/Home'
+import { MatchPage } from './pages/MatchPage'
 import { Matches } from './pages/Matches'
 import { Player } from './pages/Player'
 import { Squad } from './pages/Squad'
@@ -24,6 +25,7 @@ const teamRoutes = (team: 'primer' | 'juvenil', path: string) => (
   >
     <Route index element={<Home />} />
     <Route path="partidos" element={<Matches />} />
+    <Route path="partido/:id" element={<MatchPage />} />
     <Route path="clasificacion" element={<Table />} />
     <Route path="plantilla" element={<Squad />} />
     <Route path="jugador/:id" element={<Player />} />

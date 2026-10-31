@@ -47,6 +47,7 @@ const matches: Match[] = [
         { min: 85, in: 'MARTÍN MANGLANO, HUGO', out: 'HERNANDEZ CALCERRADA, PABLO' },
       ],
       goals: [{ min: 36, player: 'HERNANDEZ CALCERRADA, PABLO' }],
+      rivalGoals: [{ min: 17, player: 'DELGADO PIÑA, VICTOR' }, { min: 36, player: 'ARCE PADILLA, IVAN' }, { min: 48, player: 'PELAEZ ANEGAS, ALVARO' }],
     },
   },
   {
@@ -69,6 +70,7 @@ const matches: Match[] = [
         { min: 78, player: 'TENAJAS MANZANERO, ADRIAN' },
         { min: 86, player: 'TENAJAS MANZANERO, ADRIAN' },
       ],
+      rivalGoals: [{ min: 24, player: 'SANCHEZ CARABAÑO, ALEJANDRO' }],
     },
   },
   {
@@ -100,6 +102,13 @@ const matches: Match[] = [
         { min: 80, in: 'ROSADO DE CARLOS, EDGAR', out: 'SERNA RAMIREZ, DANIEL' },
       ],
       goals: [{ min: 24, player: 'MUÑOZ DÍAZ, DIEGO' }],
+      rivalGoals: [
+        { min: 5, player: 'FLORES ARENAS, TOMAS' },
+        { min: 58, player: 'GIMENA SANCHEZ, PABLO' },
+        { min: 61, player: 'CARRASCO CALERO, HUGO' },
+        { min: 68, player: 'MELERO ROJO, ALBERT' },
+        { min: 86, player: 'MELERO ROJO, ALBERT' },
+      ],
     },
   },
   {
@@ -116,6 +125,12 @@ const matches: Match[] = [
       goals: [
         { min: 63, player: 'MARTÍN MANGLANO, HUGO' },
         { min: 80, player: 'BOUNAB CHARQI, MOHAMED' },
+      ],
+      rivalGoals: [
+        { min: 22, player: 'RUIZ SANTA QUITERIA GUERRERO, JUAN' },
+        { min: 69, player: 'MONCAYO VILLAR, ARTURO' },
+        { min: 78, player: 'CASTELLANOS MIGALLON, ALEJANDRO' },
+        { min: 93, player: 'RUIZ SANTA QUITERIA GUERRERO, JUAN' },
       ],
     },
   },
