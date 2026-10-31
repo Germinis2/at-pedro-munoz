@@ -33,6 +33,10 @@ const crests: Record<string, string> = {
   'Atlético Cervantino': 'atleticocervantino',
   'Membrilla C.F.': 'membrilla',
   'E.F.B. Atlético Valdepeñas': 'valdepenasatletico',
+  'Carretero E.F.B. Valdepeñas': 'carreterovaldepenas',
+  'Daimiel Racing C.F.': 'daimiel',
+  'Camuñas F.C.': 'camunas',
+  'U.D. Santa Cruz': 'santacruz',
 }
 
 export const crestFor = (team: string) => (crests[team] ? `/escudos/${crests[team]}.webp` : undefined)
