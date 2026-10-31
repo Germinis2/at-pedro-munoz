@@ -2,24 +2,43 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { candidates, fetchResults, vote, votedFor } from '../data/mvp'
 import { useTeam } from '../data/teams'
+import type { MvpPoll } from '../data/types'
 import { PlayerImage } from './PlayerImage'
 
 type Results = { player_id: string; votes: number }[]
 
 export function MvpCard() {
   const team = useTeam()
-  const poll = team.polls[0] // la más reciente
-  const match = poll && team.matches.find((m) => m.id === poll.match_id)
+  const [poll, setPoll] = useState<MvpPoll | null>(null)
   const [results, setResults] = useState<Results | null>(null)
   const [voted, setVoted] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const match = poll && team.matches.find((m) => m.id === poll.match_id)
 
+  // Primero una votación abierta; si no hay, el ganador de la cerrada del partido más reciente que tenga votos
   useEffect(() => {
-    if (!poll) return
-    setVoted(votedFor(poll.id))
-    fetchResults(poll.id).then(setResults).catch(() => setResults([]))
-  }, [poll])
+    let cancelled = false
+    const dateOf = (p: MvpPoll) => team.matches.find((m) => m.id === p.match_id)?.date ?? ''
+    const open = team.polls.filter((p) => p.status === 'open')
+    const closed = team.polls.filter((p) => p.status === 'closed').sort((a, b) => dateOf(b).localeCompare(dateOf(a)))
+    ;(async () => {
+      for (const p of [...open, ...closed]) {
+        const r = await fetchResults(p.id).catch(() => [])
+        if (p.status === 'open' || r.length) {
+          if (cancelled) return
+          setPoll(p)
+          setResults(r)
+          setVoted(votedFor(p.id))
+          return
+        }
+      }
+      if (!cancelled) setPoll(null)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [team])
 
   if (!poll || !match) return null
   const list = candidates(match, team.players)
