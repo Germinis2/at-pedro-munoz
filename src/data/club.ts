@@ -6,6 +6,10 @@ export const club = {
   stadium: 'Juande Ramos',
   town: 'Pedro Muñoz',
   crest: '/escudo.webp',
+  social: {
+    instagram: 'https://www.instagram.com/atleticopedromunoz/',
+    facebook: 'https://www.facebook.com/people/ATC-PEDRO-MU%C3%91OZ/100094759347387/',
+  },
 }
 
 // Escudos de los rivales en /public/escudos (generados con scripts/escudos.mjs)

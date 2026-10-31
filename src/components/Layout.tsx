@@ -3,7 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { club } from '../data/club'
 import { useTeam } from '../data/teams'
 import { Crest } from './Crest'
-import { BallIcon, ChartIcon, HomeIcon, ShirtIcon, TrophyIcon } from './Icons'
+import { BallIcon, ChartIcon, FacebookIcon, HomeIcon, InstagramIcon, ShirtIcon, TrophyIcon } from './Icons'
 
 const nav = [
   { to: '', label: 'Inicio', Icon: HomeIcon },
@@ -59,12 +59,46 @@ export function Layout() {
         <div className="h-1 bg-[linear-gradient(90deg,var(--color-club-500)_0_60%,white_60%_63%,var(--color-club-500)_63%_66%,transparent_66%)]" />
       </header>
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-32 pt-5 md:px-8 md:pb-16 md:pt-10">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 pt-5 md:px-8 md:pb-16 md:pt-10">
         <Outlet />
       </main>
 
-      <footer className="hidden border-t border-white/5 py-6 text-center font-display text-sm uppercase tracking-widest text-white/40 md:block">
-        {club.name} · {club.town} · Temporada {club.season}
+      {/* En el móvil deja hueco abajo para la barra flotante */}
+      <footer className="border-t border-white/10 bg-club-950/70 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] pt-8 md:pb-8">
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-5 px-4 text-center md:flex-row md:justify-between md:px-8 md:text-left">
+          <div className="flex flex-col items-center gap-3 md:flex-row">
+            <Crest className="size-12" />
+            <div>
+              <p className="font-display text-xl font-extrabold uppercase italic tracking-wide">{club.name}</p>
+              <p className="font-display text-sm font-semibold uppercase tracking-widest text-white/50">
+                {club.town} · Temporada {club.season}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col items-center gap-2 md:items-end">
+            <p className="font-display text-xs font-bold uppercase tracking-[0.2em] text-club-300">Síguenos</p>
+            <div className="flex gap-3">
+              {[
+                { href: club.social.instagram, label: 'Instagram', Icon: InstagramIcon },
+                { href: club.social.facebook, label: 'Facebook', Icon: FacebookIcon },
+              ].map(({ href, label, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${club.shortName} en ${label}`}
+                  className="flex -skew-x-12 items-center gap-2 border border-white/15 px-4 py-2.5 font-display text-sm font-bold uppercase tracking-wider text-white/80 transition hover:border-club-500 hover:bg-club-500 hover:text-white"
+                >
+                  <span className="flex skew-x-12 items-center gap-2">
+                    <Icon className="size-5" />
+                    {label}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
       </footer>
 
       {/* Barra flotante en el móvil */}
