@@ -1,5 +1,12 @@
 import { supabase } from '../lib/supabase'
-import type { Match, Player } from './types'
+import type { Match, MvpPoll, Player } from './types'
+
+// Las votaciones se cierran solas a las 48 horas (en Supabase, cada 5 minutos); aquí se tiene en cuenta al momento
+const HOURS = 48
+export const closesAt = (p: MvpPoll) => new Date(new Date(p.opened_at).getTime() + HOURS * 3_600_000)
+export const isOpen = (p: MvpPoll, now = Date.now()) => p.status === 'open' && closesAt(p).getTime() > now
+export const fmtCloses = (p: MvpPoll) =>
+  closesAt(p).toLocaleString('es-ES', { weekday: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 
 // Candidatos: los que jugaron el partido (titulares y los que entraron)
 export function candidates(match: Match, players: Player[]) {

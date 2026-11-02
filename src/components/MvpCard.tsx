@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { candidates, fetchResults, vote, votedFor } from '../data/mvp'
+import { candidates, fetchResults, fmtCloses, isOpen, vote, votedFor } from '../data/mvp'
 import { useTeam } from '../data/teams'
 import type { MvpPoll } from '../data/types'
 import { PlayerImage } from './PlayerImage'
@@ -22,12 +22,12 @@ export function MvpCard({ matchId }: { matchId?: number }) {
     let cancelled = false
     const dateOf = (p: MvpPoll) => team.matches.find((m) => m.id === p.match_id)?.date ?? ''
     const polls = matchId === undefined ? team.polls : team.polls.filter((p) => p.match_id === matchId)
-    const open = polls.filter((p) => p.status === 'open')
-    const closed = polls.filter((p) => p.status === 'closed').sort((a, b) => dateOf(b).localeCompare(dateOf(a)))
+    const open = polls.filter((p) => isOpen(p))
+    const closed = polls.filter((p) => !isOpen(p)).sort((a, b) => dateOf(b).localeCompare(dateOf(a)))
     ;(async () => {
       for (const p of [...open, ...closed]) {
         const r = await fetchResults(p.id).catch(() => [])
-        if (p.status === 'open' || r.length) {
+        if (isOpen(p) || r.length) {
           if (cancelled) return
           setPoll(p)
           setResults(r)
@@ -47,7 +47,7 @@ export function MvpCard({ matchId }: { matchId?: number }) {
   const total = results?.reduce((a, r) => a + r.votes, 0) ?? 0
   const byId = (id: string) => team.players.find((p) => p.id === id)
   const pct = (id: string) => (total ? Math.round(((results?.find((r) => r.player_id === id)?.votes ?? 0) / total) * 100) : 0)
-  const open = poll.status === 'open'
+  const open = isOpen(poll)
   const showResults = !open || !!voted
 
   const submit = async (id: string) => {
@@ -95,7 +95,7 @@ export function MvpCard({ matchId }: { matchId?: number }) {
     <section>
       {head}
       <div className="panel p-4">
-        <p className="mb-3 text-sm text-white/60">{showResults ? `Gracias por votar · ${total} ${total === 1 ? 'voto' : 'votos'}` : '¿Quién fue el mejor? Un voto por dispositivo.'}</p>
+        <p className="mb-3 text-sm text-white/60">{showResults ? `Gracias por votar · ${total} ${total === 1 ? 'voto' : 'votos'}` : `¿Quién fue el mejor? Un voto por dispositivo. Se cierra el ${fmtCloses(poll)}.`}</p>
         <ul className="grid gap-2 sm:grid-cols-2">
           {list.map((p) => (
             <li key={p.id}>

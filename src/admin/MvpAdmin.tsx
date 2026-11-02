@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { club, crestFor } from '../data/club'
-import { fetchResults } from '../data/mvp'
+import { fetchResults, fmtCloses, isOpen } from '../data/mvp'
 import { mvpImageBlob, shareOrDownload } from '../data/mvpImage'
 import { notify } from '../data/push'
 import { useTeams } from '../data/teams'
@@ -46,7 +46,7 @@ export function MvpAdmin({ team }: { team: 'primer' | 'juvenil' }) {
     const p = players.find((x) => x.id === id)
     return p ? `${p.firstName} ${p.lastName}` : id
   }
-  const openPoll = polls.find((p) => p.status === 'open')
+  const openPoll = polls.find((p) => isOpen(p))
 
   // Imagen vertical del ganador para publicar en Instagram (en el móvil se comparte directamente)
   const instagram = async (m: MatchRow, playerId: string, votes: number, total: number) => {
@@ -73,7 +73,7 @@ export function MvpAdmin({ team }: { team: 'primer' | 'juvenil' }) {
   return (
     <div className="space-y-3">
       <Notice>
-        Abre la votación de un partido jugado: en la portada aparecerán los jugadores que jugaron. Al cerrarla, la portada muestra al ganador.
+        Abre la votación de un partido jugado: en la portada aparecerán los jugadores que jugaron. Se cierra sola a las 48 horas (o antes, con «Cerrar votación»); al reabrirla vuelve a tener 48 horas. Al cerrarse, la portada muestra al ganador.
         {openPoll && ' Solo conviene tener una votación abierta a la vez.'}
       </Notice>
       {error && <Notice kind="error">{error}</Notice>}
@@ -89,23 +89,23 @@ export function MvpAdmin({ team }: { team: 'primer' | 'juvenil' }) {
               </p>
               {!m.lineup && <span className="text-xs text-white/50">Sin alineación: importa el acta primero</span>}
               {m.lineup && !poll && <Button onClick={() => openVote(m.id!)}>Abrir votación</Button>}
-              {poll?.status === 'open' && (
+              {poll && isOpen(poll) && (
                 <Button variant="danger" onClick={() => run(supabase.from('mvp_polls').update({ status: 'closed', closed_at: new Date().toISOString() }).eq('id', poll.id))}>
                   Cerrar votación
                 </Button>
               )}
-              {poll?.status === 'closed' && total > 0 && (
+              {poll && !isOpen(poll) && total > 0 && (
                 <Button onClick={() => instagram(m, res[0].player_id, res[0].votes, total)}>📸 Imagen para Instagram</Button>
               )}
-              {poll?.status === 'closed' && (
-                <Button variant="ghost" onClick={() => run(supabase.from('mvp_polls').update({ status: 'open', closed_at: null }).eq('id', poll.id))}>
+              {poll && !isOpen(poll) && (
+                <Button variant="ghost" onClick={() => run(supabase.from('mvp_polls').update({ status: 'open', closed_at: null, opened_at: new Date().toISOString() }).eq('id', poll.id))}>
                   Reabrir
                 </Button>
               )}
             </div>
             {poll && (
               <div className="text-sm">
-                <p className="mb-1 text-xs text-white/50">{poll.status === 'open' ? 'Abierta' : 'Cerrada'} · {total} votos</p>
+                <p className="mb-1 text-xs text-white/50">{isOpen(poll) ? `Abierta · se cierra sola el ${fmtCloses(poll)}` : 'Cerrada'} · {total} votos</p>
                 <ol className="space-y-0.5">
                   {res.slice(0, 5).map((r, i) => (
                     <li key={r.player_id} className="flex justify-between">
