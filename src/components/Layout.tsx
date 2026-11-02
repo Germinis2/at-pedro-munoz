@@ -3,7 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { club } from '../data/club'
 import { useTeam } from '../data/teams'
 import { Crest } from './Crest'
-import { BallIcon, ChartIcon, FacebookIcon, HomeIcon, InstagramIcon, ShirtIcon, TrophyIcon } from './Icons'
+import { BagIcon, BallIcon, ChartIcon, FacebookIcon, HomeIcon, InstagramIcon, ShirtIcon, TrophyIcon } from './Icons'
 import { Sponsors } from './Sponsors'
 
 const nav = [
@@ -12,6 +12,7 @@ const nav = [
   { to: '/clasificacion', label: 'Tabla', Icon: TrophyIcon },
   { to: '/plantilla', label: 'Plantilla', Icon: ShirtIcon },
   { to: '/estadisticas', label: 'Stats', Icon: ChartIcon },
+  { to: '/tienda', label: 'Tienda', Icon: BagIcon },
 ]
 
 export function Layout() {
@@ -106,14 +107,14 @@ export function Layout() {
 
       {/* Barra flotante en el móvil */}
       <nav className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 overflow-hidden rounded-xl border border-white/10 bg-club-950/90 shadow-2xl shadow-black/60 backdrop-blur-lg md:hidden">
-        <ul className="grid grid-cols-5">
+        <ul className="grid grid-cols-6">
           {nav.map(({ to, label, Icon }) => (
             <li key={to}>
               <NavLink
                 to={href(to)}
                 end={to === ''}
                 className={({ isActive }) =>
-                  `relative flex h-15 flex-col items-center justify-center gap-0.5 font-display text-[12px] font-bold uppercase tracking-wider transition-colors ${
+                  `relative flex h-15 flex-col items-center justify-center gap-0.5 font-display text-[11px] font-bold uppercase tracking-wide transition-colors ${
                     isActive ? 'bg-club-500 text-white' : 'text-white/55'
                   }`
                 }

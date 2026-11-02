@@ -6,6 +6,7 @@ import { Home } from './pages/Home'
 import { MatchPage } from './pages/MatchPage'
 import { Matches } from './pages/Matches'
 import { Player } from './pages/Player'
+import { Shop } from './pages/Shop'
 import { Squad } from './pages/Squad'
 import { Stats } from './pages/Stats'
 import { Table } from './pages/Table'
@@ -30,6 +31,7 @@ const teamRoutes = (team: 'primer' | 'juvenil', path: string) => (
     <Route path="plantilla" element={<Squad />} />
     <Route path="jugador/:id" element={<Player />} />
     <Route path="estadisticas" element={<Stats />} />
+    <Route path="tienda" element={<Shop />} />
     <Route path="*" element={<Home />} />
   </Route>
 )

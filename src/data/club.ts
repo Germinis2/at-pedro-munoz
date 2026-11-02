@@ -6,6 +6,7 @@ export const club = {
   stadium: 'Juande Ramos',
   town: 'Pedro Muñoz',
   crest: '/escudo.webp',
+  whatsapp: '34687815646', // tienda: pedidos por WhatsApp (con prefijo de España)
   social: {
     instagram: 'https://www.instagram.com/atleticopedromunoz/',
     facebook: 'https://www.facebook.com/people/ATC-PEDRO-MU%C3%91OZ/100094759347387/',

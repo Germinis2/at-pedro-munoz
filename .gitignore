@@ -25,3 +25,7 @@ dist-ssr
 
 # Descargas originales de fotos (pesan y tienen duplicados)
 assets-src/fotos-originales/
+
+# Página de Instagram guardada (solo de referencia)
+assets-src/tienda/bufanda.html
+assets-src/tienda/bufanda_files/

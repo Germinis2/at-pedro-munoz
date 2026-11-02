@@ -9,6 +9,7 @@ import { LiveAdmin } from './LiveAdmin'
 import { MatchesAdmin } from './MatchesAdmin'
 import { MvpAdmin } from './MvpAdmin'
 import { PlayersAdmin } from './PlayersAdmin'
+import { ShopAdmin } from './ShopAdmin'
 import { SponsorsAdmin } from './SponsorsAdmin'
 import { StandingsAdmin } from './StandingsAdmin'
 import { Button, Notice } from './ui'
@@ -20,6 +21,7 @@ const tabs = {
   jugadores: 'Jugadores',
   clasificacion: 'Clasificación',
   mvp: 'MVP',
+  tienda: 'Tienda',
   patrocinadores: 'Patrocinadores',
   admins: 'Administradores',
 } as const
@@ -98,6 +100,7 @@ export default function Admin() {
             {tab === 'jugadores' && <PlayersAdmin team={team} />}
             {tab === 'clasificacion' && <StandingsAdmin team={team} />}
             {tab === 'mvp' && <MvpAdmin team={team} />}
+            {tab === 'tienda' && <ShopAdmin />}
             {tab === 'patrocinadores' && <SponsorsAdmin />}
             {tab === 'admins' && <AdminsAdmin me={session.user.email ?? ''} />}
           </div>
