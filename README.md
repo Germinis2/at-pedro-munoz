@@ -98,7 +98,7 @@ Para entrar al panel, añade tu email a la tabla `public.admins` y crea la cuent
 
 ## Despliegue
 
-Está preparada para Vercel. `vercel.json` redirige todas las rutas a la SPA. Hay que configurar las variables `VITE_SUPABASE_URL` y `VITE_SUPABASE_PUBLISHABLE_KEY` y añadir el dominio a la *Site URL* y a las *Redirect URLs* de Supabase Auth.
+Está preparada para Vercel. `vercel.json` redirige todas las rutas a la SPA. La URL y la clave publishable del proyecto de Supabase van en `src/lib/supabase.ts` (son públicas; los datos los protege RLS) y se pueden cambiar con `VITE_SUPABASE_URL` y `VITE_SUPABASE_PUBLISHABLE_KEY`. Hay que añadir el dominio a la *Site URL* y a las *Redirect URLs* de Supabase Auth.
 
 ---
 
