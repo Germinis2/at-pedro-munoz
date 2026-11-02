@@ -23,12 +23,13 @@ function ProductCard({ p }: { p: Product }) {
   const [i, setI] = useState(0)
   const img = p.images[i]
   return (
-    <article className="panel flex flex-col overflow-hidden">
-      <div className="relative grid aspect-square place-items-center bg-white">
+    <article className="panel flex min-w-0 flex-col overflow-hidden">
+      {/* Imagen en posición absoluta: en Safari, una imagen grande dentro de una celda de grid ensancha la columna y la tarjeta se sale por la derecha */}
+      <div className="relative aspect-square w-full bg-white">
         {img ? (
-          <img src={productImageUrl(img.path)} alt={`${p.name}${p.images.length > 1 ? ` · ${img.label}` : ''}`} loading="lazy" className="size-full object-contain" />
+          <img src={productImageUrl(img.path)} alt={`${p.name}${p.images.length > 1 ? ` · ${img.label}` : ''}`} loading="lazy" className="absolute inset-0 size-full object-contain" />
         ) : (
-          <span className="text-sm text-club-800/50">Sin foto</span>
+          <span className="absolute inset-0 grid place-items-center text-sm text-club-800/50">Sin foto</span>
         )}
         <span className="absolute left-3 top-3 -skew-x-12 bg-club-600 px-3 py-1 font-display text-lg font-extrabold">
           <span className="block skew-x-12">{fmtPrice(p.price)}</span>
@@ -81,7 +82,7 @@ export function Shop() {
       ) : products.length === 0 ? (
         <p className="panel p-6 text-center text-white/60">Ahora mismo no hay artículos. Escríbenos y te contamos.</p>
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((p) => <ProductCard key={p.id} p={p} />)}
         </div>
       )}
