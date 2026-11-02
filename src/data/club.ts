@@ -6,7 +6,11 @@ export const club = {
   stadium: 'Juande Ramos',
   town: 'Pedro Muñoz',
   crest: '/escudo.webp',
+  stadiumFull: 'Estadio Municipal Juande Ramos',
+  stadiumPhoto: '/estadio.webp',
+  maps: 'https://maps.app.goo.gl/MGuU6u6U9bn4FW3U8',
   whatsapp: '34687815646', // tienda: pedidos por WhatsApp (con prefijo de España)
+  phone: '687 81 56 46', // contacto del pie: el mismo número que el WhatsApp
   social: {
     instagram: 'https://www.instagram.com/atleticopedromunoz/',
     facebook: 'https://www.facebook.com/people/ATC-PEDRO-MU%C3%91OZ/100094759347387/',

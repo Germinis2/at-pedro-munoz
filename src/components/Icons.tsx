@@ -26,7 +26,13 @@ export const BallIcon = (p: SVGProps<SVGSVGElement>) => (
 export const ChartIcon = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M5 20V12M12 20V5M19 20v-9" /></svg>
 )
-export const BagIcon = (p: SVGProps<SVGSVGElement>) => (
+export const PinIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
+)
+export const PhoneIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" /></svg>
+)
+export const BagIcon =(p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2" /></svg>
 )
 export const WhatsAppIcon = (p: SVGProps<SVGSVGElement>) => (

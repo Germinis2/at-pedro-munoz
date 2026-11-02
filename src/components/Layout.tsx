@@ -3,7 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { club } from '../data/club'
 import { useTeam } from '../data/teams'
 import { Crest } from './Crest'
-import { BagIcon, BallIcon, ChartIcon, FacebookIcon, HomeIcon, InstagramIcon, ShirtIcon, TrophyIcon } from './Icons'
+import { BagIcon, BallIcon, ChartIcon, FacebookIcon, HomeIcon, InstagramIcon, PhoneIcon, PinIcon, ShirtIcon, TrophyIcon } from './Icons'
 import { Sponsors } from './Sponsors'
 
 const nav = [
@@ -75,6 +75,32 @@ export function Layout() {
               <p className="font-display text-sm font-semibold uppercase tracking-widest text-white/50">
                 {club.town} · Temporada {club.season}
               </p>
+            </div>
+          </div>
+          {/* Estadio: foto, cómo llegar y teléfono */}
+          <div className="flex w-full max-w-sm flex-col overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] text-left sm:flex-row md:max-w-md">
+            <img
+              src={club.stadiumPhoto}
+              alt={club.stadiumFull}
+              loading="lazy"
+              className="aspect-[16/9] w-full object-cover sm:aspect-auto sm:w-40 sm:shrink-0"
+            />
+            <div className="flex flex-col gap-2 p-4">
+              <p className="font-display text-xs font-bold uppercase tracking-[0.2em] text-club-300">Nuestro campo</p>
+              <p className="font-display text-lg font-extrabold uppercase italic leading-tight">{club.stadiumFull}</p>
+              <a
+                href={club.maps}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white"
+              >
+                <PinIcon className="size-4 shrink-0 text-club-400" />
+                Cómo llegar · {club.town}
+              </a>
+              <a href={`tel:+${club.whatsapp}`} className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white">
+                <PhoneIcon className="size-4 shrink-0 text-club-400" />
+                {club.phone}
+              </a>
             </div>
           </div>
           <div className="flex flex-col items-center gap-2 md:items-end">
