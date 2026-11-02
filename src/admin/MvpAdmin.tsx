@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { fetchResults } from '../data/mvp'
+import { notify } from '../data/push'
 import { useTeams } from '../data/teams'
 import type { MatchRow, MvpPoll } from '../data/types'
 import { supabase } from '../lib/supabase'
@@ -32,6 +33,12 @@ export function MvpAdmin({ team }: { team: 'primer' | 'juvenil' }) {
     load()
     reload()
   }
+  // Abre la votación y avisa a quien tenga los avisos activados
+  const openVote = async (matchId: number) => {
+    const { data, error } = await supabase.from('mvp_polls').insert({ match_id: matchId }).select('id').single()
+    if (!error) await notify('mvp', data.id)
+    run(Promise.resolve({ error }))
+  }
   const players = teams[team].players
   const name = (id: string) => {
     const p = players.find((x) => x.id === id)
@@ -57,7 +64,7 @@ export function MvpAdmin({ team }: { team: 'primer' | 'juvenil' }) {
                 J{m.round} · {m.home ? 'vs' : 'en'} {m.opponent} <span className="text-white/50">({m.score_us}-{m.score_them})</span>
               </p>
               {!m.lineup && <span className="text-xs text-white/50">Sin alineación: importa el acta primero</span>}
-              {m.lineup && !poll && <Button onClick={() => run(supabase.from('mvp_polls').insert({ match_id: m.id }))}>Abrir votación</Button>}
+              {m.lineup && !poll && <Button onClick={() => openVote(m.id!)}>Abrir votación</Button>}
               {poll?.status === 'open' && (
                 <Button variant="danger" onClick={() => run(supabase.from('mvp_polls').update({ status: 'closed', closed_at: new Date().toISOString() }).eq('id', poll.id))}>
                   Cerrar votación

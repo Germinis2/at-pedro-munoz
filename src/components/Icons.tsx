@@ -26,7 +26,10 @@ export const BallIcon = (p: SVGProps<SVGSVGElement>) => (
 export const ChartIcon = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M5 20V12M12 20V5M19 20v-9" /></svg>
 )
-export const PinIcon = (p: SVGProps<SVGSVGElement>) => (
+export const BellIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0" /></svg>
+)
+export const PinIcon =(p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
 )
 export const PhoneIcon = (p: SVGProps<SVGSVGElement>) => (

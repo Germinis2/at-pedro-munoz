@@ -26,6 +26,7 @@ Se pueden ver los resultados, la clasificación, la plantilla con la ficha de ca
 - **Plantilla** en carrusel y **ficha de jugador** con foto, dorsal, posición y estadísticas: partidos, minutos, goles, asistencias y tarjetas. Los porteros muestran además porterías a cero y paradas.
 - **Estadísticas** con clasificaciones por cada dato y **tabla de la liga**.
 - **Votación del MVP**: el club abre y cierra cada votación, y se permite un voto por dispositivo.
+- **Avisos (notificaciones push)**: con un botón en la portada, cada aficionado activa los avisos de su equipo y le llega una notificación cuando se abre la votación del MVP y cuando está el resultado final. En iPhone funcionan con la web añadida a la pantalla de inicio.
 - **Tienda**: artículos con foto, precio y modelos. El botón «Pedir por WhatsApp» abre el chat del club con el artículo y el modelo ya escritos.
 - **Pie de página** con las redes sociales y un mosaico con los logos de los patrocinadores.
 
@@ -43,6 +44,7 @@ Se pueden ver los resultados, la clasificación, la plantilla con la ficha de ca
 - **Lector de actas probado con actas reales.** `src/data/acta.ts` interpreta el texto copiado de la web de la FFCM. Los tests usan actas reales como fixtures y comparan los resultados con las estadísticas del propio club.
 - **Seguridad con Row Level Security.** La lectura es pública y solo pueden escribir los emails de la tabla `admins` (función `is_admin()`). Los votos no se pueden leer desde el cliente: se emiten y se cuentan con funciones RPC `security definer`. Un trigger en `auth.users` impide registrarse a quien no esté invitado.
 - **Funciona aunque falle el backend.** Lleva una copia local de los datos que se muestra al instante y se sustituye por la de Supabase cuando esta responde.
+- **Avisos con Web Push y una función edge.** El panel llama a la función `avisos` de Supabase, que comprueba que quien llama es administrador, envía la notificación firmada con VAPID a las suscripciones del equipo y la apunta para no repetirla. Las suscripciones solo se escriben con funciones RPC y no se pueden leer desde la web.
 - **El panel se carga aparte** (`React.lazy`): el público no descarga su código.
 - **Imágenes optimizadas.** Los scripts con `sharp` recortan las fotos de los jugadores, quitan el fondo de los escudos y generan WebP. Las imágenes que se suben desde el panel se reducen en el navegador antes de enviarlas.
 - **Diseño propio** en rojo, con Barlow Condensed y formas inclinadas, a partir de un mockup de ficha de jugador y de carrusel de plantilla.

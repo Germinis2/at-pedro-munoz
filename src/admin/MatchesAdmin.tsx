@@ -4,6 +4,7 @@ import { actaUrl } from '../data/build'
 import { splitFfcm } from '../data/names'
 import { useTeams } from '../data/teams'
 import type { Lineup, MatchRow, PlayerRow } from '../data/types'
+import { notify } from '../data/push'
 import { supabase } from '../lib/supabase'
 import { Button, Field, Input, Notice, Select, inputCls, num } from './ui'
 
@@ -143,9 +144,14 @@ function MatchEditor({ initial, players, onDone }: { initial: MatchRow; players:
     setBusy(true)
     const { id, ...row } = m
     const q = id ? supabase.from('matches').update(row).eq('id', id) : supabase.from('matches').insert(row)
-    const { error } = await q
+    const { data, error } = await q.select('id').single()
+    if (error) {
+      setBusy(false)
+      return setMsg({ kind: 'error', text: error.message })
+    }
+    // Con resultado: avisa del final (solo la primera vez que se guarda con marcador)
+    if (row.score_us != null) await notify('result', data.id)
     setBusy(false)
-    if (error) return setMsg({ kind: 'error', text: error.message })
     onDone()
   }
 

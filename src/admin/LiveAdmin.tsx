@@ -3,6 +3,7 @@ import { liveMinute, toMatch } from '../data/build'
 import { club } from '../data/club'
 import { splitFfcm } from '../data/names'
 import type { Lineup, MatchRow, PlayerRow } from '../data/types'
+import { notify } from '../data/push'
 import { supabase } from '../lib/supabase'
 import { useNow } from '../lib/useNow'
 import { Button, Input, Notice, Select } from './ui'
@@ -56,6 +57,8 @@ export function LiveAdmin({ team }: { team: 'primer' | 'juvenil' }) {
     if (error) return setError(error.message)
     setError('')
     setMatches((ms) => ms.map((x) => (x.id === row.id ? (data as MatchRow) : x)))
+    // Final del partido: aviso con el resultado
+    if (patch.live_status === 'finished') notify('result', row.id!)
   }
 
   const open = (a: Action) => {
@@ -221,7 +224,7 @@ export function LiveAdmin({ team }: { team: 'primer' | 'juvenil' }) {
                 <Button className={big} onClick={() => save({ live_status: 'second_half', second_half_at: new Date().toISOString() })}>▶ Empieza la 2ª parte</Button>
               )}
               {status === 'second_half' && (
-                <Button className={big} variant="danger" onClick={() => confirm('¿Terminar el partido?') && save({ live_status: 'finished' })}>■ Final del partido</Button>
+                <Button className={big} variant="danger" onClick={() => confirm('¿Terminar el partido?') && save({ live_status: 'finished', score_us: row?.score_us ?? 0, score_them: row?.score_them ?? 0 })}>■ Final del partido</Button>
               )}
             </>
           )}

@@ -94,11 +94,11 @@ export function Layout() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white"
               >
-                <PinIcon className="size-4 shrink-0 text-club-400" />
+                <PinIcon className="size-4 shrink-0 text-club-300" />
                 Cómo llegar · {club.town}
               </a>
               <a href={`tel:+${club.whatsapp}`} className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white">
-                <PhoneIcon className="size-4 shrink-0 text-club-400" />
+                <PhoneIcon className="size-4 shrink-0 text-club-300" />
                 {club.phone}
               </a>
             </div>

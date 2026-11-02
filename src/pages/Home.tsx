@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
+import { AlertsCard } from '../components/AlertsCard'
 import { Crest } from '../components/Crest'
 import { MatchCard, ResultDot, fmtLongDay, fmtTime } from '../components/MatchCard'
 import { MvpCard } from '../components/MvpCard'
@@ -129,6 +130,8 @@ export function Home() {
       )}
 
       <MvpCard />
+
+      <AlertsCard key={team.id} />
 
       <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
         {/* Próximo partido */}
