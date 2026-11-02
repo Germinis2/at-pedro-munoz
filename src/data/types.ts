@@ -21,14 +21,6 @@ export interface Match {
   score?: { us: number; them: number }
   acta?: number
   lineup?: Lineup
-  live?: Live
-}
-
-export type LiveStatus = 'first_half' | 'half_time' | 'second_half' | 'finished'
-export interface Live {
-  status: LiveStatus
-  firstHalfAt: string | null
-  secondHalfAt: string | null
 }
 
 export interface Standing {
@@ -88,6 +80,7 @@ export interface PlayerRow {
   saves: number
   yellow_cards: number
   red_cards: number
+  photo?: string | null // null: la incluida en la web; 'none': sin foto; otra: ruta en el bucket "players"
 }
 
 export interface MatchRow {
@@ -103,9 +96,6 @@ export interface MatchRow {
   score_them: number | null
   acta: number | null
   lineup: Lineup | null
-  live_status?: LiveStatus | null
-  first_half_at?: string | null
-  second_half_at?: string | null
 }
 
 export interface StandingRow extends Omit<Standing, 'ours'> {

@@ -2,11 +2,10 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Crest } from '../components/Crest'
 import { BallIcon } from '../components/Icons'
-import { LiveBadge } from '../components/LiveBadge'
 import { fmtLongDay, fmtTime } from '../components/MatchCard'
 import { MvpCard } from '../components/MvpCard'
 import { PlayerImage } from '../components/PlayerImage'
-import { actaUrl, isLive } from '../data/build'
+import { actaUrl } from '../data/build'
 import { club } from '../data/club'
 import { splitFfcm } from '../data/names'
 import { useTeam, useTeams } from '../data/teams'
@@ -70,17 +69,13 @@ function Header({ m }: { m: Match }) {
             ) : (
               <p className="font-display text-3xl font-extrabold md:text-5xl">{fmtTime(m)}</p>
             )}
-            {isLive(m) ? (
-              <LiveBadge match={m} className="mt-2" />
-            ) : (
-              <p className="mt-2 font-display text-xs font-bold uppercase tracking-[0.2em] text-white/70">{score ? 'Final' : 'Próximo'}</p>
-            )}
+            <p className="mt-2 font-display text-xs font-bold uppercase tracking-[0.2em] text-white/70">{score ? 'Final' : 'Próximo'}</p>
           </div>
           {side(away)}
         </div>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-white/75">
           {m.venue && <span>🏟 {m.venue}</span>}
-          {m.acta && m.score && !isLive(m) && (
+          {m.acta && m.score && (
             <a href={actaUrl(m.acta)} target="_blank" rel="noopener noreferrer" className="font-semibold underline decoration-white/30 underline-offset-4 hover:decoration-white">
               Acta oficial FFCM ↗
             </a>

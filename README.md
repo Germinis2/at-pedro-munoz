@@ -2,7 +2,7 @@
 
 Web del **Atlético Pedro Muñoz C.F.** (Segunda Autonómica, Grupo 3, FFCM) y de su **equipo juvenil** (Juvenil Territorial, Grupo 3). Pensada sobre todo para el móvil, que es como la consulta la afición, y adaptada también al ordenador.
 
-Se pueden ver los resultados, la clasificación, la plantilla con la ficha de cada jugador y las estadísticas de la temporada. La afición vota al MVP de cada partido, puede seguir los partidos en directo y hace pedidos a la tienda del club por WhatsApp. Todo se gestiona desde un panel de administración, sin tocar código.
+Se pueden ver los resultados, la clasificación, la plantilla con la ficha de cada jugador y las estadísticas de la temporada. La afición vota al MVP de cada partido, recibe avisos y hace pedidos a la tienda del club por WhatsApp. Todo se gestiona desde un panel de administración, sin tocar código.
 
 <!-- Capturas: guarda las imágenes en docs/capturas/ y descomenta esta línea
 <p align="center">
@@ -12,7 +12,7 @@ Se pueden ver los resultados, la clasificación, la plantilla con la ficha de ca
 </p>
 -->
 
-**Tecnologías:** React 19 · TypeScript · Vite · Tailwind CSS v4 · Supabase (Postgres, Auth, Storage y Realtime) · Vitest · Vercel
+**Tecnologías:** React 19 · TypeScript · Vite · Tailwind CSS v4 · Supabase (Postgres, Auth, Storage y Edge Functions) · Vitest · Vercel
 
 ---
 
@@ -22,7 +22,6 @@ Se pueden ver los resultados, la clasificación, la plantilla con la ficha de ca
 - **Portada** con el último resultado, el próximo partido, la votación del MVP abierta y las clasificaciones internas de goleadores y MVPs.
 - **Primer equipo y juvenil** desde un selector en la portada, con la misma estructura (`/` y `/juvenil`).
 - **Partidos**: calendario y resultados. Cada partido tiene su página con el marcador, la cronología (goles y cambios de los dos equipos), las alineaciones de ambos y el MVP votado.
-- **Partido en directo**: el marcador y el minuto se actualizan solos (Supabase Realtime) mientras el club lleva el partido desde el panel.
 - **Plantilla** en carrusel y **ficha de jugador** con foto, dorsal, posición y estadísticas: partidos, minutos, goles, asistencias y tarjetas. Los porteros muestran además porterías a cero y paradas.
 - **Estadísticas** con clasificaciones por cada dato y **tabla de la liga**.
 - **Votación del MVP**: el club abre y cierra cada votación, y se permite un voto por dispositivo.
@@ -32,7 +31,8 @@ Se pueden ver los resultados, la clasificación, la plantilla con la ficha de ca
 
 ### Para el club (panel `/admin`)
 - **Importar actas de la FFCM**: se pega el texto del acta y la web saca las alineaciones, los minutos, los goles y los cambios de los dos equipos. También se puede editar todo a mano.
-- **Directo**: convocatoria, inicio, descanso, segunda parte y final, más goles y cambios, con opción de deshacer. Si un partido no se lleva en directo, se completa después con el acta.
+- **Fotos de jugadores**: se suben desde el panel y se recortan solas en el navegador, tanto la plantilla horizontal del club como una foto vertical.
+- **Imagen del MVP para Instagram**: al cerrar la votación, el panel genera una imagen vertical (1080×1350) con la foto del ganador, sus votos y el resultado. Está dibujada con canvas y en el móvil se comparte directamente.
 - Gestión de **jugadores** (dorsal, posición, asistencias, paradas y tarjetas), **clasificación**, **votaciones del MVP**, **tienda** y **patrocinadores** (logos subidos a Storage).
 - **Varios administradores**: solo se pueden registrar los emails que otro administrador haya invitado.
 

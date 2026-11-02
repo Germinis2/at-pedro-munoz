@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { positionLabels, positionOrder } from '../data/build'
 import { splitFfcm } from '../data/names'
+import { photoFor, removePlayerPhoto, uploadPlayerPhoto } from '../data/photos'
 import { useTeams } from '../data/teams'
 import type { PlayerRow, Position } from '../data/types'
 import { supabase } from '../lib/supabase'
@@ -26,6 +27,27 @@ function PlayerRowEditor({ initial, full, onSaved }: { initial: PlayerRow; full:
     setError('')
     onSaved()
   }
+  // La foto se guarda al momento, sin pasar por «Guardar»
+  const [busy, setBusy] = useState(false)
+  const setPhoto = async (photo: string | null) => {
+    const { error } = await supabase.from('players').update({ photo }).eq('id', p.id)
+    if (error) return setError(error.message)
+    await removePlayerPhoto(initial.photo)
+    setError('')
+    onSaved()
+  }
+  const upload = async (file?: File) => {
+    if (!file) return
+    setBusy(true)
+    try {
+      await setPhoto(await uploadPlayerPhoto(file))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo subir la foto')
+    }
+    setBusy(false)
+  }
+  const photo = photoFor(initial)
+
   const remove = async () => {
     if (!confirm(`¿Quitar a ${p.display_name || splitFfcm(p.ffcm).short} de la plantilla?`)) return
     const { error } = await supabase.from('players').delete().eq('id', p.id)
@@ -35,8 +57,20 @@ function PlayerRowEditor({ initial, full, onSaved }: { initial: PlayerRow; full:
 
   return (
     <div className="panel space-y-3 p-4">
-      <div className="flex items-center gap-2">
-        <p className="min-w-0 flex-1 truncate text-sm font-semibold">{splitFfcm(p.ffcm).name} {splitFfcm(p.ffcm).surnames}</p>
+      <div className="flex items-center gap-3">
+        <div className="h-16 w-12 shrink-0 overflow-hidden rounded-sm bg-white/10">
+          {photo && <img src={photo} alt="" className="size-full object-cover object-top" />}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold">{splitFfcm(p.ffcm).name} {splitFfcm(p.ffcm).surnames}</p>
+          <div className="mt-1 flex flex-wrap gap-3 text-xs font-semibold">
+            <label className={`cursor-pointer text-club-300 hover:text-white ${busy ? 'pointer-events-none opacity-50' : ''}`}>
+              {busy ? 'Subiendo…' : photo ? 'Cambiar foto' : 'Subir foto'}
+              <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(e) => upload(e.target.files?.[0])} />
+            </label>
+            {photo && <button className="text-white/50 hover:text-white" onClick={() => confirm('¿Quitar la foto?') && setPhoto('none')}>Quitar foto</button>}
+          </div>
+        </div>
         {dirty && <Button onClick={save}>Guardar</Button>}
         <Button variant="ghost" onClick={remove} aria-label="Quitar de la plantilla">✕</Button>
       </div>
@@ -96,6 +130,9 @@ export function PlayersAdmin({ team }: { team: 'primer' | 'juvenil' }) {
 
   return (
     <div className="space-y-4">
+      <Notice>
+        Fotos: vale la imagen horizontal del club (escudo a la izquierda, jugador a la derecha) o una foto vertical; se recorta sola.
+      </Notice>
       <Notice>
         Partidos, minutos, goles{full && ' y porterías a 0'} se calculan solos con las actas.
         {full && ' Asistencias, paradas y tarjetas se apuntan aquí.'}

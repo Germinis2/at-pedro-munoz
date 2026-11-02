@@ -18,7 +18,7 @@ function statsFor(raw: string, keeper: boolean, matches: Match[]) {
   let appearances = 0, starts = 0, minutes = 0, goals = 0, cleanSheets = 0
   for (const m of matches) {
     const l = m.lineup
-    if (!l || !m.score || isLive(m)) continue // un partido en directo cuenta cuando termina
+    if (!l || !m.score) continue
     const started = l.starters.some(([, n]) => n === raw)
     const subIn = l.subs.find((s) => s.in === raw)
     const subOut = l.subs.find((s) => s.out === raw)
@@ -45,26 +45,7 @@ export const toMatch = (r: MatchRow): Match => ({
   score: r.score_us != null && r.score_them != null ? { us: r.score_us, them: r.score_them } : undefined,
   acta: r.acta ?? undefined,
   lineup: r.lineup ?? undefined,
-  live: r.live_status ? { status: r.live_status, firstHalfAt: r.first_half_at ?? null, secondHalfAt: r.second_half_at ?? null } : undefined,
 })
-
-// En juego (empezado y sin terminar)
-export const isLive = (m: Match) => !!m.live && m.live.status !== 'finished'
-
-// Minuto del directo según la hora de inicio de cada parte: "23'", "45+2'", "DESCANSO", "90+3'"
-export function liveMinute(m: Match, now = Date.now()) {
-  const l = m.live
-  if (!l) return null
-  if (l.status === 'half_time') return { label: 'Descanso', minute: 45 }
-  if (l.status === 'finished') return { label: 'Final', minute: 90 }
-  const from = l.status === 'first_half' ? l.firstHalfAt : l.secondHalfAt
-  if (!from) return null
-  const elapsed = Math.max(0, Math.floor((now - new Date(from).getTime()) / 60_000)) + 1
-  const base = l.status === 'first_half' ? 0 : 45
-  const minute = base + elapsed
-  const cap = base + 45
-  return { label: minute > cap ? `${cap}+${minute - cap}'` : `${minute}'`, minute }
-}
 
 export function buildPlayer(row: PlayerRow, matches: Match[], mvps = 0): Player {
   const { name, surnames, short } = splitFfcm(row.ffcm)
@@ -72,7 +53,7 @@ export function buildPlayer(row: PlayerRow, matches: Match[], mvps = 0): Player 
   return {
     id: row.id,
     ffcm: row.ffcm,
-    photo: photoFor(row.team_id, row.id),
+    photo: photoFor(row),
     firstName: first,
     lastName: rest.join(' '),
     nickname: row.nickname ?? undefined,
@@ -116,11 +97,9 @@ export const sortPlayers = (players: Player[]) =>
 export const kickoff = (m: Match) => new Date(`${m.date}T${m.time ?? '00:00'}`)
 
 export const upcoming = (matches: Match[], now = new Date()) =>
-  matches.filter((m) => !m.score && !m.live && kickoff(m) >= new Date(now.toDateString())).sort((a, b) => a.date.localeCompare(b.date))
+  matches.filter((m) => !m.score && kickoff(m) >= new Date(now.toDateString())).sort((a, b) => a.date.localeCompare(b.date))
 
-export const played = (matches: Match[]) => matches.filter((m) => m.score && !isLive(m)).sort((a, b) => b.date.localeCompare(a.date))
-
-export const liveMatch = (matches: Match[]) => matches.find(isLive)
+export const played = (matches: Match[]) => matches.filter((m) => m.score).sort((a, b) => b.date.localeCompare(a.date))
 
 export const actaUrl = (acta: number) =>
   `https://www.ffcm.es/pnfg/NPcd/NFG_CmpPartido?cod_primaria=1000120&CodActa=${acta}&cod_acta=${acta}`

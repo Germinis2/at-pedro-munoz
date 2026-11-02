@@ -60,21 +60,6 @@ export function TeamsProvider({ children }: { children: ReactNode }) {
     reload()
   }, [reload])
 
-  // Directo: cuando un admin cambia un partido (gol, cambio, descanso…) se recargan los datos al momento
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>
-    const channel = supabase
-      .channel('partidos')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'matches' }, () => {
-        clearTimeout(timer)
-        timer = setTimeout(reload, 300) // agrupa varios cambios seguidos
-      })
-      .subscribe()
-    return () => {
-      clearTimeout(timer)
-      supabase.removeChannel(channel)
-    }
-  }, [reload])
   return <TeamsContext.Provider value={{ teams, live, reload }}>{children}</TeamsContext.Provider>
 }
 

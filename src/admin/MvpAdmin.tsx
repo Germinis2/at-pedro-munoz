@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
+import { club, crestFor } from '../data/club'
 import { fetchResults } from '../data/mvp'
+import { mvpImageBlob, shareOrDownload } from '../data/mvpImage'
 import { notify } from '../data/push'
 import { useTeams } from '../data/teams'
 import type { MatchRow, MvpPoll } from '../data/types'
@@ -46,6 +48,28 @@ export function MvpAdmin({ team }: { team: 'primer' | 'juvenil' }) {
   }
   const openPoll = polls.find((p) => p.status === 'open')
 
+  // Imagen vertical del ganador para publicar en Instagram (en el móvil se comparte directamente)
+  const instagram = async (m: MatchRow, playerId: string, votes: number, total: number) => {
+    const p = players.find((x) => x.id === playerId)
+    const us = { name: club.shortName, crest: club.crest, goals: m.score_us ?? 0 }
+    const them = { name: m.opponent, crest: crestFor(m.opponent), goals: m.score_them ?? 0 }
+    try {
+      const blob = await mvpImageBlob({
+        name: p ? `${p.firstName} ${p.lastName}` : name(playerId),
+        photo: p?.photo,
+        round: m.round,
+        pct: Math.round((votes / total) * 100),
+        votes: total,
+        juvenil: team === 'juvenil',
+        home: m.home ? us : them,
+        away: m.home ? them : us,
+      })
+      await shareOrDownload(blob, `mvp-${team}-jornada-${m.round}.jpg`)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo crear la imagen')
+    }
+  }
+
   return (
     <div className="space-y-3">
       <Notice>
@@ -69,6 +93,9 @@ export function MvpAdmin({ team }: { team: 'primer' | 'juvenil' }) {
                 <Button variant="danger" onClick={() => run(supabase.from('mvp_polls').update({ status: 'closed', closed_at: new Date().toISOString() }).eq('id', poll.id))}>
                   Cerrar votación
                 </Button>
+              )}
+              {poll?.status === 'closed' && total > 0 && (
+                <Button onClick={() => instagram(m, res[0].player_id, res[0].votes, total)}>📸 Imagen para Instagram</Button>
               )}
               {poll?.status === 'closed' && (
                 <Button variant="ghost" onClick={() => run(supabase.from('mvp_polls').update({ status: 'open', closed_at: null }).eq('id', poll.id))}>

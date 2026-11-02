@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
     : ref
   const { data: m } = await db.from('matches').select('*').eq('id', matchId).single()
   if (!m) return json({ error: 'Partido no encontrado' }, 404)
-  if (kind === 'result' && (m.score_us == null || (m.live_status && m.live_status !== 'finished'))) {
+  if (kind === 'result' && m.score_us == null) {
     return json({ sent: 0, reason: 'Sin resultado final' })
   }
 
