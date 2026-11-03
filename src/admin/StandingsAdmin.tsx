@@ -1,16 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
+import { isClub, matchName, parseClasificacion } from '../data/clasificacion'
+import { club } from '../data/club'
+import { capitalize } from '../data/names'
 import { useTeams } from '../data/teams'
 import type { Result, StandingRow } from '../data/types'
 import { supabase } from '../lib/supabase'
-import { Button, Field, Input, Notice } from './ui'
+import { Button, Field, Input, Notice, inputCls } from './ui'
 
 const cols = ['pts', 'pj', 'g', 'e', 'p', 'gf', 'gc'] as const
 
 export function StandingsAdmin({ team }: { team: 'primer' | 'juvenil' }) {
-  const { reload } = useTeams()
+  const { teams, reload } = useTeams()
   const [rows, setRows] = useState<StandingRow[]>([])
   const [round, setRound] = useState(0)
-  const [msg, setMsg] = useState<{ kind: 'error' | 'ok'; text: string } | null>(null)
+  const [msg, setMsg] = useState<{ kind: 'error' | 'ok' | 'info'; text: string } | null>(null)
+  const [pasted, setPasted] = useState('')
 
   const load = useCallback(async () => {
     const [s, t] = await Promise.all([
@@ -34,6 +38,38 @@ export function StandingsAdmin({ team }: { team: 'primer' | 'juvenil' }) {
       return copy
     })
 
+  // Pegar la página de clasificación de la FFCM: rellena la lista (con los nombres que ya usa la web) y se revisa antes de guardar
+  const readFfcm = () => {
+    try {
+      const c = parseClasificacion(pasted)
+      const candidates = [...rows.map((r) => r.team), ...teams[team].matches.map((m) => m.opponent), club.name]
+      const unknown: string[] = []
+      const next = c.rows.map((r, i): StandingRow => {
+        const ours = isClub(r.name)
+        const name = (ours ? (rows.find((x) => x.ours)?.team ?? club.name) : matchName(r.name, candidates)) ?? capitalize(r.name)
+        if (!ours && !matchName(r.name, candidates)) unknown.push(name)
+        const prev = rows.find((x) => x.team === name)
+        return {
+          team_id: team, rank: i + 1, team: name, ours, pts: r.pts, pj: r.pj, g: r.g, e: r.e, p: r.p,
+          // Sin la tabla detallada no hay goles: se dejan los de antes
+          gf: r.gf ?? prev?.gf ?? 0, gc: r.gc ?? prev?.gc ?? 0, form: r.form,
+        }
+      })
+      setRows(next)
+      setRound(c.round)
+      setPasted('')
+      const notes = [
+        `Leída la clasificación de la jornada ${c.round}: ${next.length} equipos.`,
+        ...c.warnings,
+        ...(unknown.length ? [`Equipos nuevos, revisa el nombre: ${unknown.join(', ')}.`] : []),
+        'Revisa la lista y pulsa «Guardar clasificación».',
+      ]
+      setMsg({ kind: c.detailed && !unknown.length ? 'info' : 'error', text: notes.join(' ') })
+    } catch (e) {
+      setMsg({ kind: 'error', text: e instanceof Error ? e.message : 'No se pudo leer la clasificación' })
+    }
+  }
+
   const save = async () => {
     const ranked = rows.map((r, i) => ({ ...r, rank: i + 1 }))
     const up = await supabase.from('standings').upsert(ranked)
@@ -49,6 +85,25 @@ export function StandingsAdmin({ team }: { team: 'primer' | 'juvenil' }) {
 
   return (
     <div className="space-y-4">
+      <div className="panel space-y-3 p-4">
+        <p className="text-sm font-semibold">Pegar desde la FFCM</p>
+        <ol className="list-decimal space-y-1 pl-5 text-xs text-white/60">
+          <li>
+            Abre la clasificación en la FFCM
+            {club.ffcm[team] && (
+              <>
+                {' '}
+                (<a href={club.ffcm[team]} target="_blank" rel="noreferrer" className="underline">abrir ↗</a>)
+              </>
+            )}
+            {' '}y pulsa <b>Tabla Detallada</b> (si no, no vienen los goles).
+          </li>
+          <li>Ctrl+A y Ctrl+C (en el móvil: seleccionar todo y copiar).</li>
+          <li>Pégalo abajo y pulsa «Leer clasificación». Revisa y guarda.</li>
+        </ol>
+        <textarea value={pasted} onChange={(e) => setPasted(e.target.value)} rows={3} placeholder="Pega aquí el texto de la clasificación" className={`${inputCls} font-mono text-xs`} />
+        <Button type="button" variant="ghost" disabled={!pasted.trim()} onClick={readFfcm}>Leer clasificación</Button>
+      </div>
       <div className="flex flex-wrap items-end gap-3">
         <Field label="Tras la jornada" className="w-32"><Input type="number" value={round} onChange={(e) => setRound(Number(e.target.value))} /></Field>
         <Button onClick={save}>Guardar clasificación</Button>

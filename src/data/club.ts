@@ -11,6 +11,11 @@ export const club = {
   maps: 'https://maps.app.goo.gl/MGuU6u6U9bn4FW3U8',
   whatsapp: '34687815646', // tienda: pedidos por WhatsApp (con prefijo de España)
   phone: '687 81 56 46', // contacto del pie: el mismo número que el WhatsApp
+  // Clasificación de cada equipo en la FFCM (para copiarla y pegarla en el panel)
+  ffcm: {
+    primer: 'https://www.ffcm.es/pnfg/NPcd/NFG_VisClasificacion?cod_primaria=1000120&codgrupo=23022018&codcompeticion=22916217',
+    juvenil: 'https://www.ffcm.es/pnfg/NPcd/NFG_VisClasificacion?cod_primaria=1000120&codgrupo=23172679&codcompeticion=22916222',
+  } as Record<string, string>,
   social: {
     instagram: 'https://www.instagram.com/atleticopedromunoz/',
     facebook: 'https://www.facebook.com/people/ATC-PEDRO-MU%C3%91OZ/100094759347387/',
