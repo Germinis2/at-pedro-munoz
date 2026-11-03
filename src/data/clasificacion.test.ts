@@ -57,6 +57,17 @@ describe('clasificación de la FFCM', () => {
     expect(c.warnings).toEqual([])
     expect(c.rows[11]).toMatchObject({ name: 'AT. PEDRO MUÑOZ C.F.', pts: 6, pj: 6, gf: 11, gc: 16, form: ['G', 'G', 'P', 'P', 'P'] })
     expect(matchName(c.rows[5].name, ['Daimiel Racing C.F.', 'C.F. La Solana'])).toBe('Daimiel Racing C.F.')
+    // Nombres de la web del juvenil (escudos): cada equipo de la FFCM encaja con uno distinto
+    const web = ['U.D. Santa Cruz', 'C.D. Atlético Tomelloso "B"', 'C.F. La Solana', 'Sporting de Alcázar C.F. "B"', 'Carretero E.F.B. Valdepeñas',
+      'Daimiel Racing C.F.', 'Cristo de la Vega C.F.', 'C.D.B. Herencia', 'C.D.U. Criptanense', 'C.P. Villarrobledo', 'Membrilla C.F.',
+      'Camuñas F.C.', 'Atlético Cervantino', 'E.F.B. Atlético Valdepeñas']
+    const mapped = c.rows.filter((r) => !isClub(r.name)).map((r) => matchName(r.name, web))
+    expect(mapped).not.toContain(null)
+    expect(new Set(mapped).size).toBe(14)
+  })
+
+  it('explica qué hacer si se copia la versión para móvil (sin partidos jugados)', () => {
+    expect(() => parseClasificacion(fixture('clasificacion-movil.txt'))).toThrow(/versión para móvil/)
   })
 
   it('falla con un texto que no es la clasificación', () => {

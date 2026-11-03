@@ -60,6 +60,13 @@ export function parseClasificacion(raw: string): ParsedStandings {
   }
 
   if (!rows.length) {
+    // En la versión para móvil la FFCM oculta las columnas de partidos (J, G, E, P) y la sanción
+    if (/\d,\d{4} \d+ (?:\d+ \d+ )?(?:[GEP] ){1,5}\d{1,2} /.test(flat + ' ')) {
+      throw new Error(
+        'Has copiado la versión para móvil de la FFCM, que oculta los partidos jugados, ganados, empatados y perdidos. ' +
+          'Cópiala desde un ordenador o pide la versión de ordenador en el navegador del móvil (Safari: botón «aA» → «Solicitar sitio web de escritorio»; Chrome: menú ⋮ → «Sitio de escritorio»).',
+      )
+    }
     throw new Error('No se ha encontrado la clasificación. Copia la página entera de la FFCM (Ctrl+A y Ctrl+C) y pégala aquí.')
   }
   rows.sort((a, b) => a.rank - b.rank)
@@ -68,7 +75,9 @@ export function parseClasificacion(raw: string): ParsedStandings {
   })
 
   const j = /Jornada (\d+) \(\d{2}-\d{2}-\d{4}\)/.exec(flat)
-  const round = j ? Number(j[1]) : Math.max(...rows.map((r) => r.pj))
+  const maxPj = Math.max(...rows.map((r) => r.pj))
+  const round = j ? Number(j[1]) : maxPj
+  if (round > maxPj) warnings.push(`La página marca la jornada ${round}, pero nadie ha jugado más de ${maxPj}: revisa «Tras la jornada».`)
   if (!detailed) warnings.push('Has copiado la tabla resumida, sin goles: pulsa «Tabla Detallada» en la FFCM y vuelve a copiar.')
 
   return { rows, round, detailed: !!detailed, warnings: [...new Set(warnings)] }

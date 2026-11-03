@@ -55,6 +55,9 @@ export function StandingsAdmin({ team }: { team: 'primer' | 'juvenil' }) {
           gf: r.gf ?? prev?.gf ?? 0, gc: r.gc ?? prev?.gc ?? 0, form: r.form,
         }
       })
+      // Dos equipos de la FFCM con el mismo nombre de la web se pisarían al guardar
+      const dup = next.map((r) => r.team).filter((t, i, all) => all.indexOf(t) !== i)
+      if (dup.length) throw new Error(`Dos equipos de la FFCM encajan con el mismo nombre (${[...new Set(dup)].join(', ')}). Corrígelo a mano.`)
       setRows(next)
       setRound(c.round)
       setPasted('')
@@ -98,7 +101,7 @@ export function StandingsAdmin({ team }: { team: 'primer' | 'juvenil' }) {
             )}
             {' '}y pulsa <b>Tabla Detallada</b> (si no, no vienen los goles).
           </li>
-          <li>Ctrl+A y Ctrl+C (en el móvil: seleccionar todo y copiar).</li>
+          <li>Ctrl+A y Ctrl+C. En el móvil, pide antes la versión de ordenador (Safari: «aA» → «Solicitar sitio web de escritorio»), porque la de móvil esconde columnas.</li>
           <li>Pégalo abajo y pulsa «Leer clasificación». Revisa y guarda.</li>
         </ol>
         <textarea value={pasted} onChange={(e) => setPasted(e.target.value)} rows={3} placeholder="Pega aquí el texto de la clasificación" className={`${inputCls} font-mono text-xs`} />
