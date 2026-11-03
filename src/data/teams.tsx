@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import { buildTeam } from './build'
 import { juvenilSeed } from './juvenil/seed'
 import { primerSeed } from './primer/seed'
-import type { MatchRow, MvpPoll, PlayerRow, Seed, StandingRow, Team, TeamRow } from './types'
+import type { GroupResultRow, MatchRow, MvpPoll, PlayerRow, Seed, StandingRow, Team, TeamRow } from './types'
 
 type TeamId = Team['id']
 type Teams = Record<TeamId, Team>
@@ -12,15 +12,16 @@ type Teams = Record<TeamId, Team>
 const local: Teams = { primer: buildTeam(primerSeed), juvenil: buildTeam(juvenilSeed) }
 
 async function fetchTeams(): Promise<Teams> {
-  const [t, p, m, s, v, w] = await Promise.all([
+  const [t, p, m, s, v, w, g] = await Promise.all([
     supabase.from('teams').select('*'),
     supabase.from('players').select('*'),
     supabase.from('matches').select('*').order('date'),
     supabase.from('standings').select('*'),
     supabase.from('mvp_polls').select('*').order('opened_at', { ascending: false }),
     supabase.rpc('mvp_winners'),
+    supabase.from('group_results').select('*'),
   ])
-  const error = t.error ?? p.error ?? m.error ?? s.error ?? v.error ?? w.error
+  const error = t.error ?? p.error ?? m.error ?? s.error ?? v.error ?? w.error ?? g.error
   if (error) throw error
   const polls = v.data as MvpPoll[]
   const mvps = Object.fromEntries((w.data as { player_id: string; wins: number }[]).map((r) => [r.player_id, Number(r.wins)]))
@@ -30,6 +31,7 @@ async function fetchTeams(): Promise<Teams> {
       players: (p.data as PlayerRow[]).filter((x) => x.team_id === team.id),
       matches: (m.data as MatchRow[]).filter((x) => x.team_id === team.id),
       standings: (s.data as StandingRow[]).filter((x) => x.team_id === team.id),
+      results: (g.data as GroupResultRow[]).filter((x) => x.team_id === team.id),
     }
     return buildTeam(seed, polls, mvps)
   }

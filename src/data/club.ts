@@ -11,11 +11,11 @@ export const club = {
   maps: 'https://maps.app.goo.gl/MGuU6u6U9bn4FW3U8',
   whatsapp: '34687815646', // tienda: pedidos por WhatsApp (con prefijo de España)
   phone: '687 81 56 46', // contacto del pie: el mismo número que el WhatsApp
-  // Clasificación de cada equipo en la FFCM (para copiarla y pegarla en el panel)
+  // Grupo de cada equipo en la FFCM (para copiar sus páginas y pegarlas en el panel). Cambian cada temporada.
   ffcm: {
-    primer: 'https://www.ffcm.es/pnfg/NPcd/NFG_VisClasificacion?cod_primaria=1000120&codgrupo=23022018&codcompeticion=22916217',
-    juvenil: 'https://www.ffcm.es/pnfg/NPcd/NFG_VisClasificacion?cod_primaria=1000120&codgrupo=23172679&codcompeticion=22916222',
-  } as Record<string, string>,
+    primer: { temporada: 22, competicion: 22916217, grupo: 23022018 },
+    juvenil: { temporada: 22, competicion: 22916222, grupo: 23172679 },
+  } as Record<string, { temporada: number; competicion: number; grupo: number }>,
   social: {
     instagram: 'https://www.instagram.com/atleticopedromunoz/',
     facebook: 'https://www.facebook.com/people/ATC-PEDRO-MU%C3%91OZ/100094759347387/',
@@ -54,3 +54,15 @@ const crests: Record<string, string> = {
 }
 
 export const crestFor = (team: string) => (crests[team] ? `/escudos/${crests[team]}.webp` : undefined)
+
+// Páginas de la FFCM que se copian en el panel → Clasificación
+export function ffcmPages(team: string) {
+  const f = club.ffcm[team]
+  if (!f) return null
+  const base = 'https://www.ffcm.es/pnfg/NPcd'
+  return {
+    cruzada: `${base}/NFG_VisTablaCruzada?cod_primaria=1000120&CodGrupo=${f.grupo}`,
+    calendario: `${base}/NFG_VisCalendario_Vis?cod_primaria=1000120&codtemporada=${f.temporada}&codcompeticion=${f.competicion}&codgrupo=${f.grupo}`,
+    clasificacion: `${base}/NFG_VisClasificacion?cod_primaria=1000120&codgrupo=${f.grupo}&codcompeticion=${f.competicion}`,
+  }
+}

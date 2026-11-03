@@ -1,3 +1,5 @@
+import type { GroupResult } from './resultados'
+
 export type Position = 'POR' | 'DEF' | 'MED' | 'DEL'
 export type Result = 'G' | 'E' | 'P'
 
@@ -104,6 +106,16 @@ export interface StandingRow extends Omit<Standing, 'ours'> {
   ours: boolean
 }
 
+export interface GroupResultRow {
+  team_id: string
+  round: number
+  date: string | null
+  home: string
+  away: string
+  home_goals: number | null
+  away_goals: number | null
+}
+
 export interface MvpPoll {
   id: number
   match_id: number
@@ -117,6 +129,7 @@ export interface Seed {
   players: PlayerRow[]
   matches: MatchRow[]
   standings: StandingRow[]
+  results?: GroupResultRow[]
 }
 
 export type StatKey = 'appearances' | 'minutes' | 'goals' | 'assists' | 'cleanSheets' | 'saves' | 'yellowCards' | 'redCards' | 'mvps'
@@ -130,6 +143,7 @@ export interface Team {
   matches: Match[]
   standings: Standing[]
   standingsRound: number
+  results: GroupResult[] // todos los partidos del grupo (vacío si no se han cargado)
   players: Player[]
   // El juvenil solo muestra goles y minutos
   full: boolean

@@ -1,6 +1,7 @@
 import { splitFfcm } from './names'
 import { photoFor } from './photos'
-import type { Match, MatchRow, MvpPoll, Player, PlayerRow, Position, Seed, Standing, Team } from './types'
+import type { GroupResult } from './resultados'
+import type { GroupResultRow, Match, MatchRow, MvpPoll, Player, PlayerRow, Position, Seed, Standing, Team } from './types'
 
 export const positionLabels: Record<Position, { one: string; many: string }> = {
   POR: { one: 'Portero', many: 'Porteros' },
@@ -69,7 +70,9 @@ export function buildPlayer(row: PlayerRow, matches: Match[], mvps = 0): Player 
   }
 }
 
-export function buildTeam({ team, players, matches, standings }: Seed, polls: MvpPoll[] = [], mvps: Record<string, number> = {}): Team {
+export const toResult = (r: GroupResultRow): GroupResult => ({ round: r.round, date: r.date, home: r.home, away: r.away, hg: r.home_goals, ag: r.away_goals })
+
+export function buildTeam({ team, players, matches, standings, results = [] }: Seed, polls: MvpPoll[] = [], mvps: Record<string, number> = {}): Team {
   const ms = matches.map(toMatch)
   return {
     id: team.id,
@@ -80,6 +83,7 @@ export function buildTeam({ team, players, matches, standings }: Seed, polls: Mv
     matches: ms,
     standings: [...standings].sort((a, b) => a.rank - b.rank).map(({ team_id: _t, rank: _r, ...s }) => s as Standing),
     standingsRound: team.standings_round,
+    results: results.map(toResult),
     players: players.map((p) => buildPlayer(p, ms, mvps[p.id])),
     full: team.full_stats,
     polls: polls.filter((p) => ms.some((m) => m.id === p.match_id)),
